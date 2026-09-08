@@ -16,14 +16,30 @@ def generate_random():
                                     np.array([[0.4, 0.0, 0.0],
                                                 [0.0, 0.4, 0.0],
                                                   [0.0, 0.0, 0.4]]), N // 4)
-    X3 = np.random.multivariate_normal(np.array([+2.0, 0.0, 0.0]),
+    X3 = np.random.multivariate_normal(np.array([+2.0, 0.0, +2.0]),
                                     np.array([[0.4, 0.0, 0.0],
                                                 [0.0, 0.4, 0.0],
                                                   [0.0, 0.0, 0.4]]), N // 4)
-    X4 = np.random.multivariate_normal(np.array([0.0, 0.0, 0.0]),
+    X4 = np.random.multivariate_normal(np.array([0.0, +2.0, +2.0]),
                                     np.array([[0.4, 0.0, 0.0],
                                                 [0.0, 0.4, 0.0],
                                                   [0.0, 0.0, 0.4]]), N // 4)
+    # X5 = np.random.multivariate_normal(np.array([2.0, 0.0, 0.0]),
+    #                                     np.array([[0.4, 0.0, 0.0],
+    #                                                 [0.0, 0.4, 0.0],
+    #                                                   [0.0, 0.0, 0.4]]), N // 4)
+    # X6 = np.random.multivariate_normal(np.array([0.0, 2.0, 0.0]),
+    #                                     np.array([[0.4, 0.0, 0.0],
+    #                                                 [0.0, 0.4, 0.0],
+    #                                                   [0.0, 0.0, 0.4]]), N // 4)
+    # X7 = np.random.multivariate_normal(np.array([0.0, 0.0, 2.0]),
+    #                                     np.array([[0.4, 0.0, 0.0],
+    #                                                 [0.0, 0.4, 0.0],
+    #                                                   [0.0, 0.0, 0.4]]), N // 4)
+    # X8 = np.random.multivariate_normal(np.array([0.0, 0.0, 0.0]),
+    #                                     np.array([[0.4, 0.0, 0.0],
+    #                                                 [0.0, 0.4, 0.0],
+    #                                                   [0.0, 0.0, 0.4]]), N // 4)
     X = np.vstack((X1, X2, X3, X4))
     return X, N
 
@@ -36,5 +52,4 @@ def plot_X(X):
     ax.set_ylabel('Frekans')
     ax.set_zlabel('Parasal Değer')
     ax.set_title("Müşteriler")
-    ax.legend()
     plt.show()

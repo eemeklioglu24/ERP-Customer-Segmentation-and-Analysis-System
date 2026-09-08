@@ -23,6 +23,9 @@ def plot_current_state(centroids, memberships, X, K):
                                "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99"])
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(projection='3d')
+    ax.set_xlabel('Güncellik')
+    ax.set_ylabel('Frekans')
+    ax.set_zlabel('Parasal Değer')
     if memberships is None:
         ax.plot(X[:, 0], X[:, 1], X[:, 2], ".", markersize = 10, color = "black")
     else:
@@ -39,7 +42,7 @@ def plot_clusters(X, N, K):
     memberships = None
     iteration = 1
     while True:
-        if iteration == 21:
+        if iteration == 210:
             break
         print("Iteration#{}:".format(iteration))
 
