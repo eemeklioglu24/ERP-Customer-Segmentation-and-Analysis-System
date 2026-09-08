@@ -21,7 +21,7 @@ def update_memberships(centroids, X):
 def plot_current_state(centroids, memberships, X, K):
     cluster_colors = np.array(["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928",
                                "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99"])
-    cluster_names = ['Küme 1', 'Küme 2', 'Küme 3', 'Küme 4']
+    cluster_names = ['Küme 1', 'Küme 2', 'Küme 3', 'Küme 4', 'Küme 5', 'Küme 6', 'Küme 7', 'Küme 8', 'Küme 9', 'Küme 10', 'Küme 11', 'Küme 12']
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(projection='3d')
     ax.set_xlabel('Güncellik')
