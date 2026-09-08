@@ -33,7 +33,7 @@ def plot_current_state(centroids, memberships, X, K):
     plt.xlabel("$x_1$")
     plt.ylabel("$x_2$")
 
-def train_model(X, N, K):
+def plot_clusters(X, N, K):
     centroids = None
     memberships = None
     iteration = 1
@@ -64,3 +64,30 @@ def train_model(X, N, K):
             plt.show()
 
         iteration = iteration + 1
+
+def k_means_clustering(X, N, K):
+    objective_value = 1e20
+    for replication in range(100):
+        centroids = None
+        memberships = None
+        iteration = 1
+        while True:
+            if iteration == 101:
+                break
+
+            old_centroids = centroids
+            centroids = update_centroids(memberships, X, N, K)
+            if np.all(centroids == old_centroids):
+                break
+
+            old_memberships = memberships
+            memberships = update_memberships(centroids, X)
+            if np.all(memberships == old_memberships):
+                break
+
+            iteration = iteration + 1
+        D = spa.distance_matrix(centroids, X)
+        current_objective = np.sum(np.min(D, axis = 0)**2)
+        if current_objective < objective_value:
+            objective_value = current_objective
+    return(objective_value)
