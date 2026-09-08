@@ -8,22 +8,26 @@ def generate_random():
 
     # generate random samples
     np.random.multivariate_normal
-    X1 = np.random.multivariate_normal(np.array([+2.0, +2.0, +2.0]),
-                                    np.array([[0.4, 0.0, 0.0],
-                                                [0.0, 0.4, 0.0],
-                                                  [0.0, 0.0, 0.4]]), N // 4)
-    X2 = np.random.multivariate_normal(np.array([+2.0, +2.0, 0.0]),
-                                    np.array([[0.4, 0.0, 0.0],
-                                                [0.0, 0.4, 0.0],
-                                                  [0.0, 0.0, 0.4]]), N // 4)
-    X3 = np.random.multivariate_normal(np.array([+2.0, 0.0, +2.0]),
-                                    np.array([[0.4, 0.0, 0.0],
-                                                [0.0, 0.4, 0.0],
-                                                  [0.0, 0.0, 0.4]]), N // 4)
-    X4 = np.random.multivariate_normal(np.array([0.0, +2.0, +2.0]),
-                                    np.array([[0.4, 0.0, 0.0],
-                                                [0.0, 0.4, 0.0],
-                                                  [0.0, 0.0, 0.4]]), N // 4)
+    X1 = np.random.multivariate_normal(np.array([+2.0, +2.0, +2.0, 0.0]),
+                                    np.array([  [0.4, 0.0, 0.0, 0.0],
+                                                [0.0, 0.4, 0.0, 0.0],
+                                                [0.0, 0.0, 0.4, 0.0],
+                                                [0.0, 0.0, 0.0, 0.4]]), N // 4)
+    X2 = np.random.multivariate_normal(np.array([+2.0, +2.0, 0.0, 0.0]),
+                                    np.array([  [0.4, 0.0, 0.0, 0.0],
+                                                [0.0, 0.4, 0.0, 0.0],
+                                                [0.0, 0.0, 0.4, 0.0],
+                                                [0.0, 0.0, 0.0, 0.4]]), N // 4)
+    X3 = np.random.multivariate_normal(np.array([+2.0, 0.0, +2.0, 0.0]),
+                                    np.array([  [0.4, 0.0, 0.0, 0.0],
+                                                [0.0, 0.4, 0.0, 0.0],
+                                                [0.0, 0.0, 0.4, 0.0],
+                                                [0.0, 0.0, 0.0, 0.4]]), N // 4)
+    X4 = np.random.multivariate_normal(np.array([0.0, +2.0, +2.0, 0.0]),
+                                    np.array([  [0.4, 0.0, 0.0, 0.0],
+                                                [0.0, 0.4, 0.0, 0.0],
+                                                [0.0, 0.0, 0.4, 0.0],
+                                                [0.0, 0.0, 0.0, 0.4]]), N // 4)
     # X5 = np.random.multivariate_normal(np.array([2.0, 0.0, 0.0]),
     #                                     np.array([[0.4, 0.0, 0.0],
     #                                                 [0.0, 0.4, 0.0],

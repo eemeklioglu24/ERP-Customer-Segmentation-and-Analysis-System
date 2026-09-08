@@ -21,6 +21,7 @@ def update_memberships(centroids, X):
 def plot_current_state(centroids, memberships, X, K):
     cluster_colors = np.array(["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928",
                                "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99"])
+    cluster_names = ['Küme 1', 'Küme 2', 'Küme 3', 'Küme 4']
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(projection='3d')
     ax.set_xlabel('Güncellik')
@@ -30,11 +31,16 @@ def plot_current_state(centroids, memberships, X, K):
         ax.plot(X[:, 0], X[:, 1], X[:, 2], ".", markersize = 10, color = "black")
     else:
         for c in range(K):
-            ax.plot(X[memberships == c, 0], X[memberships == c, 1], X[memberships == c, 2], ".", markersize = 10,
-                     color = cluster_colors[c])
+            # ax.plot(X[memberships == c, 0], X[memberships == c, 1], X[memberships == c, 2], ".", markersize = 10,
+            #          color = cluster_colors[c])
+            ax.scatter(X[memberships == c, 0], X[memberships == c, 1], X[memberships == c, 2], ".",
+                     color = cluster_colors[c], label= cluster_names[c])
     for c in range(K):
         ax.plot(centroids[c, 0], centroids[c, 1], centroids[c, 2], "s", markersize = 12, 
                  markerfacecolor = cluster_colors[c], markeredgecolor = "black")
+        ax.legend(loc='upper left', frameon=True)
+        ax.view_init(vertical_axis= "z")
+        
     
 
 def plot_clusters(X, N, K):
