@@ -21,17 +21,18 @@ def update_memberships(centroids, X):
 def plot_current_state(centroids, memberships, X, K):
     cluster_colors = np.array(["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928",
                                "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99"])
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(projection='3d')
     if memberships is None:
-        plt.plot(X[:, 0], X[:, 1], ".", markersize = 10, color = "black")
+        ax.plot(X[:, 0], X[:, 1], X[:, 2], ".", markersize = 10, color = "black")
     else:
         for c in range(K):
-            plt.plot(X[memberships == c, 0], X[memberships == c, 1], ".", markersize = 10,
+            ax.plot(X[memberships == c, 0], X[memberships == c, 1], X[memberships == c, 2], ".", markersize = 10,
                      color = cluster_colors[c])
     for c in range(K):
-        plt.plot(centroids[c, 0], centroids[c, 1], "s", markersize = 12, 
+        ax.plot(centroids[c, 0], centroids[c, 1], centroids[c, 2], "s", markersize = 12, 
                  markerfacecolor = cluster_colors[c], markeredgecolor = "black")
-    plt.xlabel("$x_1$")
-    plt.ylabel("$x_2$")
+    
 
 def plot_clusters(X, N, K):
     centroids = None
@@ -46,22 +47,17 @@ def plot_clusters(X, N, K):
         centroids = update_centroids(memberships, X, N, K)
         if np.all(centroids == old_centroids):
             break
-        else:
-            plt.figure(figsize = (12, 6))    
-            plt.subplot(1, 2, 1)
-            plot_current_state(centroids, memberships, X, K)
-
         old_memberships = memberships
         memberships = update_memberships(centroids, X)
         if np.all(memberships == old_memberships):
-            plt.subplot(1, 2, 2)
-            plt.axis("off")
+            plot_current_state(centroids, memberships, X, K)
+            plt.title("Iteration: " + str(iteration))
             plt.show()
             break
-        else:
-            plt.subplot(1, 2, 2)
-            plot_current_state(centroids, memberships, X)
-            plt.show()
+        # else:
+        #     plot_current_state(centroids, memberships, X, K)
+        #     plt.title(str(iteration))
+        #     plt.show()
 
         iteration = iteration + 1
 
@@ -91,3 +87,13 @@ def k_means_clustering(X, N, K):
         if current_objective < objective_value:
             objective_value = current_objective
     return(objective_value)
+
+def get_obj(X, N):
+    objective_values = []
+    for K in np.arange(1, 11):
+        objective_values.append(k_means_clustering(X, N, K))
+    plt.figure(figsize = (8, 4))
+    plt.plot(np.arange(1, 11), objective_values, "o-")
+    plt.xlabel("$K$")
+    plt.ylabel("Objective value")
+    plt.show()
