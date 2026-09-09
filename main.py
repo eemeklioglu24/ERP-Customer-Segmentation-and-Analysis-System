@@ -5,10 +5,9 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib as plt
 
 
-def run_pipeline(num_customers=200, k=3):
+def run_pipeline(num_customers=200, K=3):
 
     # 1. Connect to data source
-    K = 3
     plt.rcParams["axes3d.mouserotationstyle"] = "azel"
     erp = FakeERP(num_customers=200)
 
@@ -50,8 +49,8 @@ def run_pipeline(num_customers=200, k=3):
         "K": K
     }
 
-def main():
-    result = run_pipeline()
+def main(K= 3):
+    result = run_pipeline(K= K)
     return result
 
 if __name__ == "__main__":
