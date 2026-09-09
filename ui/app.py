@@ -25,6 +25,5 @@ fig = px.scatter_3d(
 st.plotly_chart(fig, use_container_width=True)
 
 
-
 st.subheader("Customer RFM Data")
 st.dataframe(rfm)
