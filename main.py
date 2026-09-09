@@ -38,6 +38,7 @@ def run_pipeline(num_customers=200, k=3):
     #data_handler.dataframe_to_excel(rfm, "./docs/Customer Stats.xlsx")
 
     # 9. Return Data
+    print(objective_values)
     return {
         "sales": sales,
         "rfm": rfm,
