@@ -43,7 +43,7 @@ def plot_current_state(centroids, memberships, X, K):
         
     
 
-def plot_clusters(X, N, K):
+def find_and_plot_clusters(X, N, K):
     centroids = None
     memberships = None
     iteration = 1
@@ -69,6 +69,7 @@ def plot_clusters(X, N, K):
         #     plt.show()
 
         iteration = iteration + 1
+    return memberships
 
 def k_means_clustering(X, N, K):
     objective_value = 1e20

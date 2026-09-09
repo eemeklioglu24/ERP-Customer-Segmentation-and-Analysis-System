@@ -29,14 +29,14 @@ def main():
     # 7. Run clustering
     #labels = cluster_customers(X_scaled)
     data_handler.plot_X(X)
-    functions.plot_clusters(X, N, K)
+    memberships = functions.find_and_plot_clusters(X, N, K)
     functions.get_obj(X, N)
 
     # 8. Add cluster assignments back to the DataFrame
-    #rfm["cluster"] = labels
+    rfm["cluster"] = memberships
 
     # 9. Show results
-    #print(rfm)
+    data_handler.rfm_to_csv(rfm)
 
 
 if __name__ == "__main__":

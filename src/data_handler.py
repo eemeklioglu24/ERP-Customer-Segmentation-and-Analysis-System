@@ -29,6 +29,7 @@ def calculate_rfm(sales: pd.DataFrame, reference_date= None):
     ]
 
 def rfm_to_X(rfm: pd.DataFrame):
+    # Turns the RFM dataframe to a numpy array object and standardizes the data
     X = rfm[["recency", "frequency", "monetary"]].to_numpy()
     scalar = StandardScaler()
     X_scaled = scalar.fit_transform(X)
@@ -44,3 +45,7 @@ def plot_X(X):
     ax.set_zlabel('Parasal Değer')
     ax.set_title("Müşteriler")
     plt.show()
+
+def rfm_to_csv(rfm: pd.DataFrame):
+    # Saves rfm dataframe to an csv file
+    rfm.to_csv("./docs/customer_data.csv", index=False)
