@@ -1,14 +1,43 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from erp.fake_erp import FakeERP
+import data_handler
+import functions
 
-import data_handler as dt
-import functions as fc
+from sklearn.preprocessing import StandardScaler
+import matplotlib as plt
 
-X, N= dt.generate_random()
-#dt.plot_X(X)
 K = 4
 plt.rcParams["axes3d.mouserotationstyle"] = "azel"
 
-dt.plot_X(X)
-fc.plot_clusters(X, N, K)
-fc.get_obj(X, N)
+def main():
+
+    # 1. Connect to data source
+    erp = FakeERP(num_customers=200)
+
+    # 2. Get raw ERP transactions
+    sales = erp.get_sales()
+
+    # 3. Convert transactions into RFM data
+    rfm = data_handler.calculate_rfm(sales)
+
+    # 4. Keep customer IDs separately
+    customer_ids = rfm["customer_id"].to_numpy()
+    N = customer_ids.size
+
+    # 5. Convert RFM features to an N x D NumPy array
+    X = data_handler.rfm_to_X(rfm)
+
+    # 7. Run clustering
+    #labels = cluster_customers(X_scaled)
+    data_handler.plot_X(X)
+    functions.plot_clusters(X, N, K)
+    functions.get_obj(X, N)
+
+    # 8. Add cluster assignments back to the DataFrame
+    #rfm["cluster"] = labels
+
+    # 9. Show results
+    #print(rfm)
+
+
+if __name__ == "__main__":
+    main()

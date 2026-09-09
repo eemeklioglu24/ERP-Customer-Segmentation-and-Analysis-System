@@ -29,24 +29,16 @@ class FakeERP(ERPInterface):
         invoice_counter = 1
         for i in range(1, self.num_customers + 1):
 
-            customer_id: f"C{i:04d}"
+            customer_id = f"C{i:04d}"
             number_of_orders = random.randint(1, 30)
             for j in range(number_of_orders):
                 invoice_date = start_date + timedelta(days= random.randint(0, number_of_days))
                 amount = round(random.uniform(100, 20000), 2)
                 sales.append({
                     "customer_id": customer_id,
-                    "invoice_id": invoice_counter,
+                    "invoice_id": f"INV{invoice_counter:06d}",
                     "invoice_date": invoice_date,
                     "amount": amount
                 })
                 invoice_counter += 1
         return pd.DataFrame(sales)
-            
-
-
-
-
-
-
-    

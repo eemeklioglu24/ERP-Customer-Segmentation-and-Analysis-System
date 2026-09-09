@@ -24,7 +24,7 @@ def plot_current_state(centroids, memberships, X, K):
     cluster_names = ['Küme 1', 'Küme 2', 'Küme 3', 'Küme 4', 'Küme 5', 'Küme 6', 'Küme 7', 'Küme 8', 'Küme 9', 'Küme 10', 'Küme 11', 'Küme 12']
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(projection='3d')
-    ax.set_xlabel('Güncellik')
+    ax.set_xlabel('Son Alışverişten Geçen Süre')
     ax.set_ylabel('Frekans')
     ax.set_zlabel('Parasal Değer')
     if memberships is None:
