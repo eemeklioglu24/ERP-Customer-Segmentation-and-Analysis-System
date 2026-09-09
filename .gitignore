@@ -1,0 +1,9 @@
+# Generated / company data
+docs/*.csv
+
+# Secrets
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+.venv/

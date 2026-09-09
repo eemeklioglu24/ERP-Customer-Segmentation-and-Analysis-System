@@ -47,11 +47,11 @@ def plot_X(X):
     ax.set_title("Müşteriler")
     plt.show()
 
-def rfm_to_csv(rfm: pd.DataFrame):
+def dataframe_to_csv(rfm: pd.DataFrame, name):
     # Saves rfm dataframe to an csv file
-    rfm.to_csv("./docs/Customer Data.csv", index=False)
+    rfm.to_csv(name, index=False)
 
-def rfm_to_excel(rfm: pd.DataFrame):
+def dataframe_to_excel(rfm: pd.DataFrame):
     import pandas as pd
     # Create a writer object
     with pd.ExcelWriter("./docs/Customer Stats.xlsx", engine='openpyxl') as writer:
