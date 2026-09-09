@@ -5,12 +5,12 @@ import functions
 from sklearn.preprocessing import StandardScaler
 import matplotlib as plt
 
-K = 4
-plt.rcParams["axes3d.mouserotationstyle"] = "azel"
 
-def main():
+def run_pipeline(num_customers=200, k=3):
 
     # 1. Connect to data source
+    K = 3
+    plt.rcParams["axes3d.mouserotationstyle"] = "azel"
     erp = FakeERP(num_customers=200)
 
     # 2. Get raw ERP transactions
@@ -26,18 +26,30 @@ def main():
     # 5. Convert RFM features to an N x D NumPy array
     X = data_handler.rfm_to_X(rfm)
 
-    # 7. Run clustering
-    #labels = cluster_customers(X_scaled)
+    # 6. Run clustering
     data_handler.plot_X(X)
-    memberships = functions.find_and_plot_clusters(X, N, K)
-    functions.get_obj(X, N)
+    memberships, centroids = functions.find_and_plot_clusters(X, N, K)
+    objective_values = functions.get_obj(X, N)
 
-    # 8. Add cluster assignments back to the DataFrame
+    # 7. Add cluster assignments back to the DataFrame
     rfm["cluster"] = memberships
 
-    # 9. Show results
+    # 8. Save results
     data_handler.rfm_to_csv(rfm)
+    data_handler.rfm_to_excel(rfm)
 
+    # 9. Return Data
+    return {
+        "sales": sales,
+        "rfm": rfm,
+        "X": X,
+        "customer_ids": customer_ids,
+        "memberships": memberships,
+        "centroids": centroids
+    }
+
+def main():
+    result = run_pipeline()
 
 if __name__ == "__main__":
     main()

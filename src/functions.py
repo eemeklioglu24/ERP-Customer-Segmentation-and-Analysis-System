@@ -50,7 +50,6 @@ def find_and_plot_clusters(X, N, K):
     while True:
         if iteration == 210:
             break
-        print("Iteration#{}:".format(iteration))
 
         old_centroids = centroids
         centroids = update_centroids(memberships, X, N, K)
@@ -61,6 +60,7 @@ def find_and_plot_clusters(X, N, K):
         if np.all(memberships == old_memberships):
             plot_current_state(centroids, memberships, X, K)
             plt.title("Iteration: " + str(iteration))
+            print(f"Total Iterations: {iteration}")
             plt.show()
             break
         # else:
@@ -69,7 +69,7 @@ def find_and_plot_clusters(X, N, K):
         #     plt.show()
 
         iteration = iteration + 1
-    return memberships
+    return memberships, centroids
 
 def k_means_clustering(X, N, K):
     objective_value = 1e20
@@ -107,3 +107,4 @@ def get_obj(X, N):
     plt.xlabel("$K$")
     plt.ylabel("Objective value")
     plt.show()
+    return objective_values
