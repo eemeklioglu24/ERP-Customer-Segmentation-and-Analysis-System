@@ -29,12 +29,14 @@ def calculate_rfm(sales: pd.DataFrame, reference_date= None):
         ]
     ]
 
-def rfm_to_X(rfm: pd.DataFrame):
+def rfm_to_X(rfm: pd.DataFrame, scaler: StandardScaler):
     # Turns the RFM dataframe to a numpy array object and standardizes the data
     X = rfm[["recency", "frequency", "monetary"]].to_numpy()
-    scalar = StandardScaler()
-    X_scaled = scalar.fit_transform(X)
+    X_scaled = scaler.fit_transform(X)
     return X_scaled
+
+def inverse_centroids(centroids, scaler: StandardScaler):
+    return scaler.inverse_transform(centroids)
 
 def plot_X(X):
     # Plots X to visualize
