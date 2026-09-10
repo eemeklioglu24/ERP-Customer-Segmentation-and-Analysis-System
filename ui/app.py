@@ -5,6 +5,7 @@ import main
 import numpy as np
 
 # Initialization
+# The command is python -m streamlit run ui/app.py
 st.set_page_config(
     page_title="Müşteri Kümeleştirmesi",
     layout="wide"
@@ -37,13 +38,22 @@ fig_3d = px.scatter_3d(
     hover_data=["customer_id"],
     color_discrete_sequence=cluster_colors
 )
+fig_3d.update_layout(
+    width=1000,
+    height=1000,
+)
 fig_3d.update_traces(
     marker=dict(
         size=5,
         opacity=0.9
     )
 )
-st.plotly_chart(fig_3d, use_container_width=True)
+col1, col2, col3 = st.columns([1 , 3, 1])
+
+with col1, col3:
+    st.write("")
+with col2:
+    st.plotly_chart(fig_3d, use_container_width=True)
 
 # Cluster Profiling
 for insight in results["cluster_insights"]:
@@ -51,7 +61,7 @@ for insight in results["cluster_insights"]:
     st.markdown(f"### Küme {insight['cluster']}")
 
     st.write(
-        f"**{insight['recency_level'].capitalize()} · "
+        f"**{insight['recency_level'].capitalize()} alımlar · "
         f"{insight['frequency_level'].capitalize()} frekans · "
         f"{insight['monetary_level'].capitalize()} parasal değer**"
     )
