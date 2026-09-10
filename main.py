@@ -45,7 +45,8 @@ def run_pipeline(num_customers=200, K=3):
         "frequency": normal_centroids[:, 1],
         "monetary": normal_centroids[:, 2],
     })
-    insight = interpreter.interpret(cluster_data)
+    rfm_clustered = rfm.copy()
+    insight = interpreter.interpret(cluster_data, rfm_clustered)
 
     # 8. Save results
     data_handler.dataframe_to_csv(rfm, "./docs/Customer Data.csv")

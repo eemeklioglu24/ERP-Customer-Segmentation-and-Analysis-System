@@ -6,6 +6,7 @@ import numpy as np
 
 # Initialization
 # The command is python -m streamlit run ui/app.py
+
 st.set_page_config(
     page_title="Müşteri Kümeleştirmesi",
     layout="wide"
@@ -58,7 +59,7 @@ with col2:
 # Cluster Profiling
 for insight in results["cluster_insights"]:
 
-    st.markdown(f"### Küme {insight['cluster']}")
+    st.markdown(f"## Küme {insight['cluster']} — {insight['segment_name']}")
 
     st.write(
         f"**{insight['recency_level'].capitalize()} alımlar · "
@@ -84,6 +85,26 @@ for insight in results["cluster_insights"]:
         st.metric(
             "Ortalama parasal değer",
             f"{insight['monetary']:,.0f}₺"
+        )
+
+    col4, col5, col6 = st.columns(3)
+
+    with col4:
+        st.metric(
+            "Müşteri Sayısı",
+            f"{insight['customer_count']}"
+        )
+
+    with col5:
+        st.metric(
+            "Toplam Parasal Değer",
+            f"{insight['total_monetary']:,.0f}₺"
+        )
+
+    with col6:
+        st.metric(
+            "Toplamdaki Pay",
+            f"%{insight['monetary_share']:.1f}"
         )
 
     st.divider()
