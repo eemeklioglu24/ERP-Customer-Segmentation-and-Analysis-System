@@ -1,4 +1,5 @@
 from src.erp.fake_erp import FakeERP
+from src.erp.logo_erp import LogoERP
 from src import data_handler, functions, interpreter
 
 import pandas as pd
@@ -10,12 +11,17 @@ def run_pipeline(num_customers=200, K=3):
 
     # 1. Connect to data source
     plt.rcParams["axes3d.mouserotationstyle"] = "azel"
-    erp = FakeERP(num_customers=200)
+    # For syntethic data, use:
+    # erp = FakeERP(num_customers=200)
+    # For real data, use:
+    erp = LogoERP()
     scaler = StandardScaler()
 
     # 2. Get raw ERP transactions
     sales = erp.get_sales()
-
+    print(sales.shape)
+    print(sales["customer_id"].nunique())
+    print(sales["customer_id"].value_counts().head(10))
     # 3. Convert transactions into RFM data
     rfm = data_handler.calculate_rfm(sales)
 
