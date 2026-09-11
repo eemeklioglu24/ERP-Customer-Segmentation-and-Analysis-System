@@ -1,5 +1,6 @@
 # Generated / company data
 docs/*.csv
+sql/private/
 
 # Secrets
 .streamlit/secrets.toml
