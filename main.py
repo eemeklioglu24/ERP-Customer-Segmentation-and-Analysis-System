@@ -19,18 +19,18 @@ def run_pipeline(num_customers=200, K=3):
 
     # 2. Get raw ERP transactions
     sales = erp.get_sales()
-    print(sales.shape)
-    print(sales["customer_id"].nunique())
-    print(sales["customer_id"].value_counts().head(10))
+
     # 3. Convert transactions into RFM data
-    rfm = data_handler.calculate_rfm(sales)
+    # rfm = data_handler.calculate_rfm(sales)
+    customer_features = data_handler.calculate_customer_features(sales)
 
     # 4. Keep customer IDs separately
-    customer_ids = rfm["customer_id"].to_numpy()
+    customer_ids = customer_features["customer_id"].to_numpy()
     N = customer_ids.size
 
-    # 5. Convert RFM features to an N x D NumPy array
-    X = data_handler.rfm_to_X(rfm, scaler)
+    # 5. Convert customer features to an N x D NumPy array
+    # X = data_handler.rfm_to_X(rfm, scaler)
+    X = data_handler.features_to_X(customer_features, scaler)
 
     # 6. Run clustering
     data_handler.plot_X(X)
@@ -38,7 +38,7 @@ def run_pipeline(num_customers=200, K=3):
     objective_values = functions.get_obj(X, N)
 
     # 7. Add cluster assignments back to the DataFrame, and interpret the data
-    rfm["cluster"] = memberships
+    customer_features["cluster"] = memberships
     normal_centroids = data_handler.inverse_centroids(centroids, scaler)
     cluster_data = pd.DataFrame({
         "cluster": range(len(centroids)),
@@ -51,17 +51,32 @@ def run_pipeline(num_customers=200, K=3):
         "frequency": normal_centroids[:, 1],
         "monetary": normal_centroids[:, 2],
     })
-    rfm_clustered = rfm.copy()
+    rfm_clustered = customer_features.copy()
     insight = interpreter.interpret(cluster_data, rfm_clustered)
+    cluster_profile = (
+        customer_features
+        .groupby("cluster")
+        .agg(
+            customer_count=("customer_id", "count"),
+            recency=("recency", "mean"),
+            transaction_count=("transaction_count", "mean"),
+            monetary=("monetary", "mean"),
+            avg_order_value=("avg_order_value", "mean"),
+            product_count=("product_count", "mean"),
+            total_quantity=("total_quantity", "mean")
+        )
+    )
+
+    print(cluster_profile)
 
     # 8. Save results
-    data_handler.dataframe_to_csv(rfm, "./docs/Customer Data.csv")
+    data_handler.dataframe_to_csv(customer_features, "./docs/Customer Data.csv")
     #data_handler.dataframe_to_excel(rfm, "./docs/Customer Stats.xlsx")
 
     # 9. Return Data
     return {
         "sales": sales,
-        "rfm": rfm,
+        "features": customer_features,
         "X": X,
         "customer_ids": customer_ids,
         "memberships": memberships,
@@ -72,7 +87,7 @@ def run_pipeline(num_customers=200, K=3):
     }
 
 def main(K= 3):
-    result = run_pipeline(K= K)
+    result = run_pipeline(K= 2)
     return result
 
 if __name__ == "__main__":

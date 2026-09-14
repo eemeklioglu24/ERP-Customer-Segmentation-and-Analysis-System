@@ -25,7 +25,7 @@ def plot_current_state(centroids, memberships, X, K):
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(projection='3d')
     ax.set_xlabel('Son Alışverişten Geçen Süre')
-    ax.set_ylabel('Frekans')
+    ax.set_ylabel('İşlem Sayısı')
     ax.set_zlabel('Parasal Değer')
     if memberships is None:
         ax.plot(X[:, 0], X[:, 1], X[:, 2], ".", markersize = 10, color = "black")
