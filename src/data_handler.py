@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 from openpyxl.styles import PatternFill
 
 def calculate_rfm(sales: pd.DataFrame, reference_date= None):
@@ -141,3 +142,11 @@ def dataframe_to_excel(rfm: pd.DataFrame):
         header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
         for cell in worksheet[1]:  # Row 1 is the header
             cell.fill = header_fill
+
+def get_X_pca(X):
+    pca = PCA(n_components= 2)
+    X_pca = pca.fit_transform(X)
+    print(pca.explained_variance_ratio_)
+    print("Total explained variance:",
+    pca.explained_variance_ratio_.sum())
+    return X_pca

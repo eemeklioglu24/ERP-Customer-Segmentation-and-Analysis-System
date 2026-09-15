@@ -13,6 +13,7 @@ st.set_page_config(
 )
 
 st.title("Müşteri Segmentasyonu Kontrol Paneli")
+
 # K slider
 k = st.slider(
     "Küme Sayısı",
@@ -26,6 +27,34 @@ results = main.main(K=k)
 features = results.get("features")
 objective_values = results.get("objective_values")
 silhouette_scores = results.get("silhouette_scores")
+X_pca = results.get("X_pca")
+labels = results.get("memberships")
+customer_ids = results.get("customer_ids")
+centroids = results.get("centroids")
+
+# PCA Graph
+st.subheader("PCA Grafiği")
+data_pca = pd.DataFrame({
+    "PC1": X_pca[:, 0],
+    "PC2": X_pca[:, 1],
+    "cluster": labels.astype(str),
+    "customer_id": customer_ids,
+
+    "recency": features["recency"].values,
+    "monetary": features["monetary"].values,
+    "avg_order_value": features["avg_order_value"].values,
+    "product_count": features["product_count"].values,
+    "transaction_count": features["transaction_count"].values,
+    "total_quantity": features["total_quantity"].values
+})
+fig_pca = px.scatter(
+    data_pca,
+    x="PC1",
+    y="PC2",
+    color="cluster",
+    hover_data=["customer_id","recency","monetary","avg_order_value","product_count","transaction_count","total_quantity"],
+)
+st.plotly_chart(fig_pca, width="stretch")
 
 # 3D RFM Graph
 cluster_colors = ["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928",

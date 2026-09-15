@@ -52,8 +52,11 @@ def run_pipeline(num_customers=200, K=3):
         "frequency": normal_centroids[:, 1],
         "monetary": normal_centroids[:, 2],
     })
-    rfm_clustered = customer_features.copy()
-    insight = interpreter.interpret(cluster_data, rfm_clustered)
+    features_clustered = customer_features.copy()
+    insight = interpreter.interpret(cluster_data, features_clustered)
+
+    # 7.1. Add Principal Component Analysis for visualization
+    X_pca = data_handler.get_X_pca(X)
 
     # print(cluster_profile)
 
@@ -77,6 +80,7 @@ def run_pipeline(num_customers=200, K=3):
         "sales": sales,
         "features": customer_features,
         "X": X,
+        "X_pca": X_pca,
         "customer_ids": customer_ids,
         "memberships": memberships,
         "centroids": centroids,
