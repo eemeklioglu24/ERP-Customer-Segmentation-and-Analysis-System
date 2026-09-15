@@ -25,6 +25,7 @@ results = main.main(K=k)
 # rfm = results.get("rfm")
 features = results.get("features")
 objective_values = results.get("objective_values")
+silhouette_scores = results.get("silhouette_scores")
 
 # 3D RFM Graph
 cluster_colors = ["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928",
@@ -55,7 +56,7 @@ col1, col2, col3 = st.columns([1 , 3, 1])
 with col1, col3:
     st.write("")
 with col2:
-    st.plotly_chart(fig_3d, use_container_width=True)
+    st.plotly_chart(fig_3d, width="stretch")
 
 # Cluster Profiling
 for insight in results["cluster_insights"]:
@@ -118,9 +119,9 @@ col2.metric("Küme Sayısı", features["cluster"].nunique())
 col3.metric("Toplam Kazanç", f"{features['monetary'].sum():,.0f} ₺")
 
 # Objective Graph
-st.subheader("Hedef - Küme grafiği")
+st.subheader("Hedef - Küme Grafiği")
 data_obj = pd.DataFrame({
-    'X_Axis': [c for c in range(1, 11)],
+    'X_Axis': np.arange(2, 11),
     'Y_Axis': objective_values,
 })
 fig_obj = px.line(
@@ -129,9 +130,23 @@ fig_obj = px.line(
     y='Y_Axis',
     markers= True
 )
-st.plotly_chart(fig_obj, use_container_width=True)
+st.plotly_chart(fig_obj, width="stretch")
 
-# RFM csv
+# Silhouette Graph
+st.subheader("Taslak Grafiği")
+data_sil = pd.DataFrame({
+    'X_Axis': np.arange(2, 11),
+    'Y_Axis': silhouette_scores,
+})
+fig_sil = px.line(
+    data_sil,
+    x='X_Axis',
+    y='Y_Axis',
+    markers= True
+)
+st.plotly_chart(fig_sil, width="stretch")
+
+# X csv
 selected_cluster = st.selectbox(
     "Müşteri kümesini seçiniz",
     ["All"] + sorted(features["cluster"].astype(str).unique().tolist())

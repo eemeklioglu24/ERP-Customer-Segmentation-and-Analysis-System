@@ -36,7 +36,7 @@ def run_pipeline(num_customers=200, K=3):
     # 6. Run clustering
     data_handler.plot_X(X)
     memberships, centroids = functions.find_and_plot_clusters(X, N, K)
-    objective_values = functions.get_obj(X, N)
+    objective_values, silhouette_scores = functions.get_obj(X, N)
 
     # 7. Add cluster assignments back to the DataFrame, and interpret the data
     customer_features["cluster"] = memberships
@@ -54,19 +54,6 @@ def run_pipeline(num_customers=200, K=3):
     })
     rfm_clustered = customer_features.copy()
     insight = interpreter.interpret(cluster_data, rfm_clustered)
-    cluster_profile = (
-        customer_features
-        .groupby("cluster")
-        .agg(
-            customer_count=("customer_id", "count"),
-            recency=("recency", "mean"),
-            transaction_count=("transaction_count", "mean"),
-            monetary=("monetary", "mean"),
-            avg_order_value=("avg_order_value", "mean"),
-            product_count=("product_count", "mean"),
-            total_quantity=("total_quantity", "mean")
-        )
-    )
 
     # print(cluster_profile)
 
@@ -94,12 +81,13 @@ def run_pipeline(num_customers=200, K=3):
         "memberships": memberships,
         "centroids": centroids,
         "objective_values": objective_values,
+        "silhouette_scores": silhouette_scores,
         "K": K,
         "cluster_insights": insight
     }
 
 def main(K= 3):
-    result = run_pipeline(K= 5)
+    result = run_pipeline(K= K)
     return result
 
 if __name__ == "__main__":

@@ -120,4 +120,4 @@ def get_obj(X, N):
     plt.title("Silhouette Score by K")
     plt.show()
 
-    return objective_values
+    return objective_values, silhouette_scores
