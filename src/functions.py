@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial as spa
+from sklearn.metrics import silhouette_score
 
 def update_centroids(memberships, X, N, K):
     if memberships is None:
@@ -96,15 +97,27 @@ def k_means_clustering(X, N, K):
         current_objective = np.sum(np.min(D, axis = 0)**2)
         if current_objective < objective_value:
             objective_value = current_objective
-    return(objective_value)
+    return(objective_value, memberships)
 
 def get_obj(X, N):
     objective_values = []
-    for K in np.arange(1, 11):
-        objective_values.append(k_means_clustering(X, N, K))
+    silhouette_scores = []
+    for K in np.arange(2, 11):
+        objective, silhoutte = k_means_clustering(X, N, K)
+        objective_values.append(objective)
+        score = silhouette_score(X, silhoutte)
+        silhouette_scores.append(score)
+        
     plt.figure(figsize = (8, 4))
-    plt.plot(np.arange(1, 11), objective_values, "o-")
+    plt.plot(np.arange(2, 11), objective_values, "o-")
     plt.xlabel("$K$")
     plt.ylabel("Objective value")
     plt.show()
+
+    plt.plot(np.arange(2, 11), silhouette_scores, marker="o")
+    plt.xlabel("Number of Clusters (K)")
+    plt.ylabel("Silhouette Score")
+    plt.title("Silhouette Score by K")
+    plt.show()
+
     return objective_values

@@ -22,18 +22,19 @@ k = st.slider(
 )
         #results = main.main()
 results = main.main(K=k)
-rfm = results.get("rfm")
+# rfm = results.get("rfm")
+features = results.get("features")
 objective_values = results.get("objective_values")
 
 # 3D RFM Graph
 cluster_colors = ["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928",
                                "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99"]
 st.subheader("Müşteri Verileri")
-rfm["cluster"] = rfm["cluster"].astype(str)
+features["cluster"] = features["cluster"].astype(str)
 fig_3d = px.scatter_3d(
-    rfm,
+    features,
     x="recency",
-    y="frequency",
+    y="transaction_count",
     z="monetary",
     color="cluster",
     hover_data=["customer_id"],
@@ -112,9 +113,9 @@ for insight in results["cluster_insights"]:
 # Metrics
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Müşteri Sayısı", len(rfm))
-col2.metric("Küme Sayısı", rfm["cluster"].nunique())
-col3.metric("Toplam Kazanç", f"{rfm['monetary'].sum():,.0f} ₺")
+col1.metric("Müşteri Sayısı", len(features))
+col2.metric("Küme Sayısı", features["cluster"].nunique())
+col3.metric("Toplam Kazanç", f"{features['monetary'].sum():,.0f} ₺")
 
 # Objective Graph
 st.subheader("Hedef - Küme grafiği")
@@ -133,14 +134,14 @@ st.plotly_chart(fig_obj, use_container_width=True)
 # RFM csv
 selected_cluster = st.selectbox(
     "Müşteri kümesini seçiniz",
-    ["All"] + sorted(rfm["cluster"].astype(str).unique().tolist())
+    ["All"] + sorted(features["cluster"].astype(str).unique().tolist())
 )
 
 if selected_cluster == "All":
-    displayed = rfm
+    displayed = features
 else:
-    displayed = rfm[
-        rfm["cluster"].astype(str) == selected_cluster
+    displayed = features[
+        features["cluster"].astype(str) == selected_cluster
     ]
 
 st.dataframe(displayed)

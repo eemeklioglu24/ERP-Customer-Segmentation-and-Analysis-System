@@ -5,6 +5,7 @@ from src import data_handler, functions, interpreter
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import matplotlib as plt
+import matplotlib.pyplot as pltplt
 
 
 def run_pipeline(num_customers=200, K=3):
@@ -67,13 +68,24 @@ def run_pipeline(num_customers=200, K=3):
         )
     )
 
-    print(cluster_profile)
+    # print(cluster_profile)
 
     # 8. Save results
     data_handler.dataframe_to_csv(customer_features, "./docs/Customer Data.csv")
     #data_handler.dataframe_to_excel(rfm, "./docs/Customer Stats.xlsx")
 
     # 9. Return Data
+    #print(customer_features.describe().to_string())
+    feature_cols = ["recency", "monetary", "avg_order_value", "product_count", "transaction_count", "total_quantity"]
+    print("\n///  CORRELATION     ///\n")
+    print(customer_features[feature_cols].corr().to_string())
+
+    print("\n///  CLUSTER COUNTS    ///\n")
+    print(customer_features["cluster"].value_counts().sort_index())
+
+    print("\n///  CLUSTER MEANS     ///\n")
+    print(customer_features.groupby("cluster")[feature_cols].mean().round(2).to_string())
+
     return {
         "sales": sales,
         "features": customer_features,
@@ -87,7 +99,7 @@ def run_pipeline(num_customers=200, K=3):
     }
 
 def main(K= 3):
-    result = run_pipeline(K= 2)
+    result = run_pipeline(K= 5)
     return result
 
 if __name__ == "__main__":
