@@ -23,7 +23,7 @@ k = st.slider(
     value=4
 )
         #results = main.main()
-results = main.main(K=k)
+results = main.main(K=k, n_init=5)
 # rfm = results.get("rfm")
 features = results.get("features")
 objective_values = results.get("objective_values")

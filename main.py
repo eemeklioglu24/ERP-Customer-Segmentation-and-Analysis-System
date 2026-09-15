@@ -8,7 +8,7 @@ import matplotlib as plt
 import matplotlib.pyplot as pltplt
 
 
-def run_pipeline(num_customers=200, K=3):
+def run_pipeline(num_customers=200, K=3, n_init= 5):
 
     # 1. Connect to data source
     plt.rcParams["axes3d.mouserotationstyle"] = "azel"
@@ -35,8 +35,9 @@ def run_pipeline(num_customers=200, K=3):
 
     # 6. Run clustering
     data_handler.plot_X(X)
-    memberships, centroids = functions.find_and_plot_clusters(X, N, K)
-    objective_values, silhouette_scores = functions.get_obj(X, N)
+    #memberships, centroids = functions.find_and_plot_clusters(X, N, K)
+    objective_values, memberships, centroids, silhouette_scores = functions.robust_kmeans(X, N, K, n_init)
+    # objective_values, silhouette_scores = functions.get_obj(X, N, n_init)
 
     # 7. Add cluster assignments back to the DataFrame, and interpret the data
     customer_features["cluster"] = memberships
@@ -90,8 +91,8 @@ def run_pipeline(num_customers=200, K=3):
         "cluster_insights": insight
     }
 
-def main(K= 3):
-    result = run_pipeline(K= K)
+def main(K= 3, n_init= 5):
+    result = run_pipeline(K= K, n_init= n_init)
     return result
 
 if __name__ == "__main__":

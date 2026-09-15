@@ -97,27 +97,48 @@ def k_means_clustering(X, N, K):
         current_objective = np.sum(np.min(D, axis = 0)**2)
         if current_objective < objective_value:
             objective_value = current_objective
-    return(objective_value, memberships)
+    return(objective_value, memberships, centroids)
 
-def get_obj(X, N):
+def get_obj(X, N, n_init= 5):
     objective_values = []
     silhouette_scores = []
     for K in np.arange(2, 11):
-        objective, silhoutte = k_means_clustering(X, N, K)
+        objective, silhoutte, centroids= k_means_clustering(X, N, K)
         objective_values.append(objective)
         score = silhouette_score(X, silhoutte)
-        silhouette_scores.append(score)
-        
-    plt.figure(figsize = (8, 4))
-    plt.plot(np.arange(2, 11), objective_values, "o-")
-    plt.xlabel("$K$")
-    plt.ylabel("Objective value")
-    plt.show()
+        silhouette_scores.append(score)  
+    # plt.figure(figsize = (8, 4))
+    # plt.plot(np.arange(2, 11), objective_values, "o-")
+    # plt.xlabel("$K$")
+    # plt.ylabel("Objective value")
+    # plt.show()
 
-    plt.plot(np.arange(2, 11), silhouette_scores, marker="o")
-    plt.xlabel("Number of Clusters (K)")
-    plt.ylabel("Silhouette Score")
-    plt.title("Silhouette Score by K")
-    plt.show()
-
+    # plt.plot(np.arange(2, 11), silhouette_scores, marker="o")
+    # plt.xlabel("Number of Clusters (K)")
+    # plt.ylabel("Silhouette Score")
+    # plt.title("Silhouette Score by K")
+    # plt.show()
     return objective_values, silhouette_scores
+
+
+def robust_kmeans(X, N, K, n_init= 5):
+    best_objective = float("inf")
+    best_membership = None
+    best_centroid = None
+    for _ in range(n_init):
+        objective, memberships, centroids = k_means_clustering(X, N, K)
+        
+
+        if objective < best_objective:
+            best_objective = objective
+            best_membership = memberships
+            best_centroid = centroids
+            objective_values = []
+            silhouette_scores = []
+            for k in np.arange(2, 11):
+                objective, memberships, centroids = k_means_clustering(X, N, k)
+                objective_values.append(objective)
+                score = silhouette_score(X, memberships)
+                silhouette_scores.append(score)
+    return  (objective_values, best_membership, best_centroid, silhouette_scores)
+    
