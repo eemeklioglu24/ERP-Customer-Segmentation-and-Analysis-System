@@ -43,10 +43,16 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
         "recency_z": centroids[:, 0],
         "frequency_z": centroids[:, 1],
         "monetary_z": centroids[:, 2],
+        "avg_order_value_z": centroids[:, 3],
+        "product_count_z": centroids[:, 4],
+        "total_quantity_z": centroids[:, 5],
 
         "recency": normal_centroids[:, 0],
         "frequency": normal_centroids[:, 1],
         "monetary": normal_centroids[:, 2],
+        "avg_order_value": normal_centroids[:, 3],
+        "product_count": normal_centroids[:, 4],
+        "total_quantity": normal_centroids[:, 5],
     })
     features_clustered = customer_features.copy()
     insight = interpreter.interpret(cluster_data, features_clustered)

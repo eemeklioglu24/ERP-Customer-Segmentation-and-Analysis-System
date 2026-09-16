@@ -9,9 +9,9 @@ import main
 from src.erp import logo_erp
 from src.functions import test_robustness
 
-# Initialization
+# DATA
 # The command is python -m streamlit run ui/app.py
-if st.button("Refresh ERP Data"):
+if st.button("ERP Verilerini Yenileme"):
     erp = logo_erp.LogoERP()
     erp.refresh_features()
     st.success("Customer features refreshed.")
@@ -30,7 +30,8 @@ if not FEATURE_PATH.exists():
 st.set_page_config(page_title="Müşteri Kümeleştirmesi",layout="wide")
 st.title("Müşteri Segmentasyonu Kontrol Paneli")
 
-# K slider
+# CLUSTERING SETTINGS
+st.header("Kümeleştirme Ayarları")
 k = st.slider(
     "Küme Sayısı",
     min_value=2,
@@ -39,105 +40,37 @@ k = st.slider(
 )
         #results = main.main()
 results = main.main(K=k, n_init=5)
-# rfm = results.get("rfm")
 features = results.get("features"); X = results.get("X"); X_pca = results.get("X_pca")
 customer_ids = results.get("customer_ids"); labels = results.get("memberships"); centroids = results.get("centroids")
 objective_values = results.get("objective_values"); silhouette_scores = results.get("silhouette_scores")
 K = results.get("K"); cluster_insights = results.get("cluster_insights")
 
-
-
-
-# PCA Graph
-st.subheader("PCA Grafiği")
-fig_pca = graphs.get_pca(X_pca, labels, customer_ids, features)
-st.plotly_chart(fig_pca, width="stretch")
-
-# 3D RFM Graph
-st.subheader("Müşteri Verileri")
-fig_3d = graphs.get_rfm(features)
-col1, col2, col3 = st.columns([1 , 3, 1])
-with col1, col3:
-    st.write("")
-with col2:
-    st.plotly_chart(fig_3d, width="stretch")
-
-# Cluster Profiling
-for insight in results["cluster_insights"]:
-
-    st.markdown(f"## Küme {insight['cluster']} — {insight['segment_name']}")
-
-    st.write(
-        f"**{insight['recency_level'].capitalize()} alımlar · "
-        f"{insight['frequency_level'].capitalize()} frekans · "
-        f"{insight['monetary_level'].capitalize()} parasal değer**"
-    )
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            "Ortalama en son siparişten geçen süre",
-            f"{insight['recency']:.0f} gün"
-        )
-
-    with col2:
-        st.metric(
-            "Ortalama frekans",
-            f"{insight['frequency']:.1f}"
-        )
-
-    with col3:
-        st.metric(
-            "Ortalama parasal değer",
-            f"{insight['monetary']:,.0f}₺"
-        )
-
-    col4, col5, col6 = st.columns(3)
-
-    with col4:
-        st.metric(
-            "Müşteri Sayısı",
-            f"{insight['customer_count']}"
-        )
-
-    with col5:
-        st.metric(
-            "Toplam Parasal Değer",
-            f"{insight['total_monetary']:,.0f}₺"
-        )
-
-    with col6:
-        st.metric(
-            "Toplamdaki Pay",
-            f"%{insight['monetary_share']:.1f}"
-        )
-
-    st.divider()
-
-# Metrics
+    # Metrics
 col1, col2, col3 = st.columns(3)
 
 col1.metric("Müşteri Sayısı", len(features))
 col2.metric("Küme Sayısı", features["cluster"].nunique())
 col3.metric("Toplam Kazanç", f"{features['monetary'].sum():,.0f} ₺")
 
-# Objective Graph
+# MODEL EVALUATION
+st.header("Model Değerlendirmeleri")
+
+    # Objective Graph
 st.subheader("Hedef - Küme Grafiği")
 fig_obj = graphs.get_obj(objective_values)
 st.plotly_chart(fig_obj, width="stretch")
 
-# Silhouette Graph
+    # Silhouette Graph
 st.subheader("Silüet Grafiği")
 fig_sil = graphs.get_sil(silhouette_scores)
 st.plotly_chart(fig_sil, width="stretch")
 
-# Robustness Analysis
-st.subheader("Robustness Analysis")
+# ROBUSTNESS ANALYSIS
+st.header("Dayanıklılık Analizi")
 if st.button("Run Robustness Test"):
 
     objectives, silhouettes = test_robustness(X, len(X), K, n_runs=20)
-    
+
     objective_mean = np.mean(objectives); objective_std = np.std(objectives)
     silhouette_mean = np.mean(silhouettes); silhouette_std = np.std(silhouettes)
     silhouette_min = np.min(silhouettes); silhouette_max = np.max(silhouettes)
@@ -156,6 +89,43 @@ if st.button("Run Robustness Test"):
     st.write(f"Objective range: " f"{objective_min:.2f} – {objective_max:.2f}")
     fig_rob = graphs.get_rob(silhouettes, silhouette_mean, K)
     st.plotly_chart(fig_rob, width="stretch")
+
+# PCA VISALISATION
+st.header("PCA Grafiği")
+    # PCA Graph
+fig_pca = graphs.get_pca(X_pca, labels, customer_ids, features)
+st.plotly_chart(fig_pca, width="stretch")
+
+# CLUSTER INTERPRETATIONS
+st.header("Küme Değerlendirmeleri")
+for insight in results["cluster_insights"]:
+    st.markdown(f"## Küme {insight['cluster']} — {insight['segment_name']}")
+
+    st.write(
+            f"**Güncellik:** {insight['recency_level']}  |  "
+            f"**Frekans:** {insight['frequency_level']}  |  "
+            f"**Parasal Değer:** {insight['monetary_level']}  |  "
+            f"**Ortalama Sipariş Değeri:** {insight['avg_order_value_level']}  |  "
+            f"**Ortalama Ürün Sayısı:** {insight['product_count_level']}  |  "
+            f"**Toplam Ürün Sayısı:** {insight['total_quantity_level']}"
+    )
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Ortalama en son siparişten geçen süre", f"{insight['recency']:.0f} gün")
+    col2.metric("Ortalama frekans", f"{insight['frequency']:.1f}")
+    col3.metric("Ortalama parasal değer", f"{insight['monetary']:,.0f}₺")
+
+    col4, col5, col6 = st.columns(3)
+    col4.metric(f"Ortalama Sipariş Değeri ({insight['avg_order_value_level']})", f"{insight['avg_order_value']:.2f}")
+    col5.metric(f"Ortalama Ürün Sayısı ({insight['product_count_level']})", f"{insight['product_count']:.1f}")
+    col6.metric(f"Toplam Ürün Sayısı ({insight['total_quantity_level']})", f"{insight['total_quantity']:.1f}")
+
+    col7, col8, col9 = st.columns(3)
+    col7.metric("Müşteri Sayısı", f"{insight['customer_count']}")
+    col8.metric("Toplam Parasal Değer", f"{insight['total_monetary']:,.0f}₺")
+    col9.metric("Toplamdaki Pay", f"%{insight['monetary_share']:.1f}")
+
+    st.divider()
 
 # X csv
 st.subheader("Müşteri Verileri")

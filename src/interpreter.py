@@ -27,6 +27,9 @@ def interpret_cluster(row):
     recency_level = classify_recency_z(row["recency_z"])
     frequency_level = classify_z(row["frequency_z"])
     monetary_level = classify_z(row["monetary_z"])
+    avg_order_value_level = classify_z(row["avg_order_value_z"])
+    product_count_level = classify_z(row["product_count_z"])
+    total_quantity_level = classify_z(row["total_quantity_z"])
 
     segment_name = get_segment_name(
         recency_level,
@@ -40,10 +43,16 @@ def interpret_cluster(row):
         "recency_level": recency_level,
         "frequency_level": frequency_level,
         "monetary_level": monetary_level,
+        "avg_order_value_level": avg_order_value_level,
+        "product_count_level": product_count_level,
+        "total_quantity_level": total_quantity_level,
 
         "recency": row["recency"],
         "frequency": row["frequency"],
         "monetary": row["monetary"],
+        "avg_order_value": row["avg_order_value"],
+        "product_count": row["product_count"],
+        "total_quantity": row["total_quantity"],
 
         "customer_count": int(row["customer_count"]),
         "total_monetary": row["total_monetary"],
@@ -51,7 +60,7 @@ def interpret_cluster(row):
     }
 
 def get_segment_name(recency_level, frequency_level, monetary_level):
-
+    # This code is so ass
     high_levels = ["yüksek", "çok yüksek"]
     low_levels = ["düşük", "çok düşük"]
 
@@ -75,15 +84,17 @@ def get_segment_name(recency_level, frequency_level, monetary_level):
 
     return "Orta Değerli Müşteriler"
 
-def interpret(cluster_data: pd.DataFrame, rfm_clustered: pd.DataFrame):
+def interpret(cluster_data: pd.DataFrame, features_clustered: pd.DataFrame):
     # Interprets all clusters
     interpretations = []
 
     cluster_stats = (
-    rfm_clustered
+    features_clustered
     .groupby("cluster")
     .agg( customer_count=("customer_id", "count"), total_monetary=("monetary", "sum")).reset_index())
+
     cluster_stats["monetary_share"] = (cluster_stats["total_monetary"] / cluster_stats["total_monetary"].sum() * 100)
+    
     cluster_data = cluster_data.merge(cluster_stats, on="cluster", how="left")
 
     for _, row in cluster_data.iterrows():
