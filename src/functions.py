@@ -73,31 +73,28 @@ def find_and_plot_clusters(X, N, K):
     return memberships, centroids
 
 def k_means_clustering(X, N, K):
-    objective_value = 1e20
-    for replication in range(100):
-        centroids = None
-        memberships = None
-        iteration = 1
-        while True:
-            if iteration == 101:
-                break
+    # Finds a single run of K Means clustering that gives the runs own objective, memberships and centrids
+    centroids = None
+    memberships = None
+    iteration = 1
+    while True:
+        if iteration == 101:
+            break
 
-            old_centroids = centroids
-            centroids = update_centroids(memberships, X, N, K)
-            if np.all(centroids == old_centroids):
-                break
+        old_centroids = centroids
+        centroids = update_centroids(memberships, X, N, K)
+        if np.all(centroids == old_centroids):
+            break
 
-            old_memberships = memberships
-            memberships = update_memberships(centroids, X)
-            if np.all(memberships == old_memberships):
-                break
+        old_memberships = memberships
+        memberships = update_memberships(centroids, X)
+        if np.all(memberships == old_memberships):
+            break
 
-            iteration = iteration + 1
-        D = spa.distance_matrix(centroids, X)
-        current_objective = np.sum(np.min(D, axis = 0)**2)
-        if current_objective < objective_value:
-            objective_value = current_objective
-    return(objective_value, memberships, centroids)
+        iteration = iteration + 1
+    D = spa.distance_matrix(centroids, X)
+    current_objective = np.sum(np.min(D, axis = 0)**2)
+    return(current_objective, memberships, centroids)
 
 def get_obj(X, N, n_init= 5):
     objective_values = []
@@ -161,4 +158,18 @@ def robust_kmeans(X, N, K, n_init= 5):
         best_centroid,
         silhouette_scores
     )
+
+def test_robustness(X, N, K, n_runs=20):
+    objectives = []
+    silhouettes = []
+
+    for _ in range(n_runs):
+        objective, memberships, centroids = (
+            k_means_clustering(X, N, K)
+        )
+        objectives.append(objective)
+        score = silhouette_score(X,memberships)
+        silhouettes.append(score)
+
+    return objectives, silhouettes
     

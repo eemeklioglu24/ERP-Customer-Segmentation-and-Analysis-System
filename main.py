@@ -3,6 +3,7 @@ from src.erp.logo_erp import LogoERP
 from src import data_handler, functions, interpreter
 
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 import matplotlib as plt
 import matplotlib.pyplot as pltplt

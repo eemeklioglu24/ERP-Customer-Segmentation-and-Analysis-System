@@ -7,6 +7,7 @@ from pathlib import Path
 import graphs
 import main
 from src.erp import logo_erp
+from src.functions import test_robustness
 
 # Initialization
 # The command is python -m streamlit run ui/app.py
@@ -131,7 +132,35 @@ st.subheader("Silüet Grafiği")
 fig_sil = graphs.get_sil(silhouette_scores)
 st.plotly_chart(fig_sil, width="stretch")
 
+# Robustness Analysis
+st.subheader("Robustness Analysis")
+if st.button("Run Robustness Test"):
+
+    objectives, silhouettes = test_robustness(
+        results.get("X"),
+        len(results.get("X")),
+        results.get("K"),
+        n_runs=20
+    )
+    objective_mean = np.mean(objectives); objective_std = np.std(objectives)
+    silhouette_mean = np.mean(silhouettes); silhouette_std = np.std(silhouettes)
+    silhouette_min = np.min(silhouettes); silhouette_max = np.max(silhouettes)
+    objective_min = np.min(objectives); objective_max = np.max(objectives)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Mean Silhouette", f"{silhouette_mean:.3f}")
+        st.metric("Silhouette Std", f"{silhouette_std:.3f}")
+
+    with col2:
+        st.metric("Mean Objective", f"{objective_mean:.2f}")
+        st.metric("Objective Std", f"{objective_std:.2f}")
+
+    st.write(f"Silhouette range: " f"{silhouette_min:.3f} – {silhouette_max:.3f}")
+    st.write(f"Objective range: " f"{objective_min:.2f} – {objective_max:.2f}")
+
 # X csv
+st.subheader("Müşteri Verileri")
 selected_cluster = st.selectbox(
     "Müşteri kümesini seçiniz",
     ["All"] + sorted(features["cluster"].astype(str).unique().tolist())
