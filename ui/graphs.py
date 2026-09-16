@@ -74,3 +74,24 @@ def get_sil(silhouette_scores):
         markers= True
     )
     return fig_sil
+
+def get_rob(silhouettes, silhouette_mean, K):
+    robustness_df = pd.DataFrame({
+    "Run": range(1, len(silhouettes) + 1),
+    "Silhouette Score": silhouettes
+    })
+
+    fig = px.line(
+        robustness_df,
+        x="Run",
+        y="Silhouette Score",
+        markers=True,
+        title=f"Robustness Across Random Initializations (K={K})"
+    )
+
+    fig.add_hline(
+        y=silhouette_mean,
+        line_dash="dash",
+        annotation_text=f"Mean = {silhouette_mean:.3f}"
+    )
+    return fig

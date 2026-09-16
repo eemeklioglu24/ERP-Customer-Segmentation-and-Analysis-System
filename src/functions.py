@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial as spa
 from sklearn.metrics import silhouette_score
+import pandas as pd
 
 def update_centroids(memberships, X, N, K):
     if memberships is None:
@@ -172,4 +173,29 @@ def test_robustness(X, N, K, n_runs=20):
         silhouettes.append(score)
 
     return objectives, silhouettes
+
+def diognose_k_values(X, N, n_init= 20):
+    rows = []
+    for k in range(2, 11):
+        objectives, silhouettes = test_robustness(X, N, k, n_init)
+        rows.append({
+            "K": k,
+            "silhouette_mean": np.mean(silhouettes),
+            "silhouette_std": np.std(silhouettes),
+            "silhouette_min": np.min(silhouettes),
+            "silhouette_max": np.max(silhouettes),
+            "objective_mean": np.mean(objectives),
+            "objective_std": np.std(objectives)
+        })
+    return pd.DataFrame(rows)
+
+def diognose_specific_k(X, N, K):
+    for i in range(20):
+        objective2, memberships, centroids = k_means_clustering(X, N, K)
+
+        score = silhouette_score(X, memberships)
+
+        _, counts = np.unique(memberships, return_counts=True)
+
+        print(f"Run {i + 1}: "f"silhouette={score:.3f}, "f"sizes={counts}")
     

@@ -40,13 +40,13 @@ k = st.slider(
         #results = main.main()
 results = main.main(K=k, n_init=5)
 # rfm = results.get("rfm")
-features = results.get("features")
-objective_values = results.get("objective_values")
-silhouette_scores = results.get("silhouette_scores")
-X_pca = results.get("X_pca")
-labels = results.get("memberships")
-customer_ids = results.get("customer_ids")
-centroids = results.get("centroids")
+features = results.get("features"); X = results.get("X"); X_pca = results.get("X_pca")
+customer_ids = results.get("customer_ids"); labels = results.get("memberships"); centroids = results.get("centroids")
+objective_values = results.get("objective_values"); silhouette_scores = results.get("silhouette_scores")
+K = results.get("K"); cluster_insights = results.get("cluster_insights")
+
+
+
 
 # PCA Graph
 st.subheader("PCA Grafiği")
@@ -136,12 +136,8 @@ st.plotly_chart(fig_sil, width="stretch")
 st.subheader("Robustness Analysis")
 if st.button("Run Robustness Test"):
 
-    objectives, silhouettes = test_robustness(
-        results.get("X"),
-        len(results.get("X")),
-        results.get("K"),
-        n_runs=20
-    )
+    objectives, silhouettes = test_robustness(X, len(X), K, n_runs=20)
+    
     objective_mean = np.mean(objectives); objective_std = np.std(objectives)
     silhouette_mean = np.mean(silhouettes); silhouette_std = np.std(silhouettes)
     silhouette_min = np.min(silhouettes); silhouette_max = np.max(silhouettes)
@@ -158,6 +154,8 @@ if st.button("Run Robustness Test"):
 
     st.write(f"Silhouette range: " f"{silhouette_min:.3f} – {silhouette_max:.3f}")
     st.write(f"Objective range: " f"{objective_min:.2f} – {objective_max:.2f}")
+    fig_rob = graphs.get_rob(silhouettes, silhouette_mean, K)
+    st.plotly_chart(fig_rob, width="stretch")
 
 # X csv
 st.subheader("Müşteri Verileri")

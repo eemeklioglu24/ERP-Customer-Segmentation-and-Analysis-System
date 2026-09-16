@@ -5,6 +5,7 @@ from src import data_handler, functions, interpreter
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
 import matplotlib as plt
 import matplotlib.pyplot as pltplt
 
@@ -70,6 +71,15 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
 
     print("\n///  CLUSTER MEANS     ///\n")
     print(customer_features.groupby("cluster")[feature_cols].mean().round(2).to_string())
+
+    # print("\n///  DIOGNOSTICS     ///\n")
+    # diognostics = functions.diognose_k_values(X, N, 20)
+    # print(diognostics.to_string())
+
+    # unique, count = np.unique(memberships, return_counts=True)
+    # print(dict(zip(unique, count)))
+
+    # functions.diognose_specific_k(X, N, 2)
 
     return {
         "features": customer_features,
