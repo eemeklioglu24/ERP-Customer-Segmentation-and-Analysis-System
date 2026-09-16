@@ -7,23 +7,16 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib as plt
 import matplotlib.pyplot as pltplt
 
-
 def run_pipeline(num_customers=200, K=3, n_init= 5):
 
     # 1. Connect to data source
     plt.rcParams["axes3d.mouserotationstyle"] = "azel"
-    # For syntethic data, use:
-    # erp = FakeERP(num_customers=200)
-    # For real data, use:
-    erp = LogoERP()
     scaler = StandardScaler()
 
-    # 2. Get raw ERP transactions
-    sales = erp.get_sales()
-
-    # 3. Convert transactions into RFM data
-    # rfm = data_handler.calculate_rfm(sales)
-    customer_features = data_handler.calculate_customer_features(sales)
+    # 2. read Features
+    customer_features = pd.read_csv(
+        "./docs/Customer Features.csv"
+    )
 
     # 4. Keep customer IDs separately
     customer_ids = customer_features["customer_id"].to_numpy()
@@ -78,7 +71,6 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
     print(customer_features.groupby("cluster")[feature_cols].mean().round(2).to_string())
 
     return {
-        "sales": sales,
         "features": customer_features,
         "X": X,
         "X_pca": X_pca,

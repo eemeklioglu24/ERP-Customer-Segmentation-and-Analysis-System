@@ -1,18 +1,32 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import main
 import numpy as np
+from pathlib import Path
+
 import graphs
+import main
+from src.erp import logo_erp
 
 # Initialization
 # The command is python -m streamlit run ui/app.py
+if st.button("Refresh ERP Data"):
+    erp = logo_erp.LogoERP()
+    erp.refresh_features()
+    st.success("Customer features refreshed.")
+    st.rerun()
 
-st.set_page_config(
-    page_title="Müşteri Kümeleştirmesi",
-    layout="wide"
-)
 
+FEATURE_PATH = Path("docs/Customer Features.csv")
+if not FEATURE_PATH.exists():
+    st.warning(
+        "No local customer feature snapshot exists yet. "
+        "Press 'Refresh ERP Data' to create one."
+    )
+
+    st.stop()
+
+st.set_page_config(page_title="Müşteri Kümeleştirmesi",layout="wide")
 st.title("Müşteri Segmentasyonu Kontrol Paneli")
 
 # K slider
@@ -113,7 +127,7 @@ fig_obj = graphs.get_obj(objective_values)
 st.plotly_chart(fig_obj, width="stretch")
 
 # Silhouette Graph
-st.subheader("Taslak Grafiği")
+st.subheader("Silüet Grafiği")
 fig_sil = graphs.get_sil(silhouette_scores)
 st.plotly_chart(fig_sil, width="stretch")
 

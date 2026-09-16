@@ -120,25 +120,45 @@ def get_obj(X, N, n_init= 5):
     # plt.show()
     return objective_values, silhouette_scores
 
-
-def robust_kmeans(X, N, K, n_init= 5):
+def best_k_means_run(X, N, K, n_init):
     best_objective = float("inf")
     best_membership = None
     best_centroid = None
     for _ in range(n_init):
         objective, memberships, centroids = k_means_clustering(X, N, K)
         
-
         if objective < best_objective:
             best_objective = objective
             best_membership = memberships
             best_centroid = centroids
-            objective_values = []
-            silhouette_scores = []
-            for k in np.arange(2, 11):
-                objective, memberships, centroids = k_means_clustering(X, N, k)
-                objective_values.append(objective)
-                score = silhouette_score(X, memberships)
-                silhouette_scores.append(score)
-    return  (objective_values, best_membership, best_centroid, silhouette_scores)
+    return  (best_objective, best_membership, best_centroid)
+
+def robust_kmeans(X, N, K, n_init= 5):
+    objective_values = []
+    silhouette_scores = []
+
+    best_membership = None
+    best_centroid = None
+
+    for k in range(2, 11):
+
+        objective, memberships, centroids = best_k_means_run(
+            X, N, k, n_init
+        )
+
+        objective_values.append(objective)
+
+        score = silhouette_score(X, memberships)
+        silhouette_scores.append(score)
+
+        if k == K:
+            best_membership = memberships.copy()
+            best_centroid = centroids.copy()
+
+    return (
+        objective_values,
+        best_membership,
+        best_centroid,
+        silhouette_scores
+    )
     
