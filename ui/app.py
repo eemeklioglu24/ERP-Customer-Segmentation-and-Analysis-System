@@ -8,16 +8,24 @@ import graphs
 import main
 from src.erp import logo_erp
 from ui.database_setup import database_setup
+from ui.table_setup import table_selection
 from src.functions import test_robustness
 
 # DATA
 # The command is python -m streamlit run ui/app.py
 db_config = database_setup()
 if db_config is None:
-    st.info("Connect to the database to continue.")
+    st.info("Devam etmek için veritabanına bağlanınız.")
     st.stop()
+table_config = table_selection(db_config)
+if table_config is None:
+    st.info("Devam etmek için fatura ve stok hattı tablolarını giriniz.")
+    st.stop()
+
+
+
 if st.button("ERP Verilerini Yenileme"):
-    erp = logo_erp.LogoERP()
+    erp = logo_erp.LogoERP(table_config)
     erp.refresh_features(db_config)
     st.success("Customer features refreshed.")
     st.rerun()
