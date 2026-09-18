@@ -7,13 +7,18 @@ from pathlib import Path
 import graphs
 import main
 from src.erp import logo_erp
+from ui.database_setup import database_setup
 from src.functions import test_robustness
 
 # DATA
 # The command is python -m streamlit run ui/app.py
+db_config = database_setup()
+if db_config is None:
+    st.info("Connect to the database to continue.")
+    st.stop()
 if st.button("ERP Verilerini Yenileme"):
     erp = logo_erp.LogoERP()
-    erp.refresh_features()
+    erp.refresh_features(db_config)
     st.success("Customer features refreshed.")
     st.rerun()
 
