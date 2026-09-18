@@ -1,3 +1,4 @@
+import re
 import streamlit as st
 
 from src.erp.db_metadata import get_available_tables
@@ -5,9 +6,8 @@ from src.erp.db_metadata import get_available_tables
 
 def table_selection(db_config):
 
-    st.subheader("Veri Kaynağı Seçimi")
+    st.subheader("Data Source Selection")
 
-    # If tables were already selected, return them.
     if st.session_state.get("tables_selected", False):
         return st.session_state["table_config"]
 
@@ -26,51 +26,100 @@ def table_selection(db_config):
         set(table["schema"] for table in tables)
     )
 
-    with st.form("table_selection_form"):
+    selected_schema = st.selectbox(
+        "Schema",
+        schemas
+    )
 
-        selected_schema = st.selectbox(
-            "Şema",
-            schemas
+    schema_tables = [
+        table["table"]
+        for table in tables
+        if table["schema"] == selected_schema
+    ]
+
+    pattern = re.compile(
+        r"^LG_(\d+)_(\d+)_(INVOICE|STLINE)$",
+        re.IGNORECASE
+    )
+
+    available_sources = {}
+
+    for table_name in schema_tables:
+
+        match = pattern.match(table_name)
+
+        if not match:
+            continue
+
+        firm = match.group(1)
+        period = match.group(2)
+        table_type = match.group(3).upper()
+
+        key = (firm, period)
+
+        if key not in available_sources:
+            available_sources[key] = {}
+
+        available_sources[key][table_type] = table_name
+
+    # IMPORTANT: this must be OUTSIDE the for-loop
+    valid_sources = {
+        key: value
+        for key, value in available_sources.items()
+        if "INVOICE" in value and "STLINE" in value
+    }
+
+    if not valid_sources:
+        st.warning(
+            "No valid Firm / Period combinations containing both "
+            "INVOICE and STLINE tables were found."
         )
+        return None
 
-        schema_tables = [
-            table["table"]
-            for table in tables
-            if table["schema"] == selected_schema
-        ]
+    firms = sorted(
+        set(firm for firm, period in valid_sources.keys())
+    )
 
-        invoice_tables = [
-            table
-            for table in schema_tables
-            if "INVOICE" in table.upper()
-        ]
+    selected_firm = st.selectbox(
+    "Firm",
+    firms
+    )
 
-        stockline_tables = [
-            table
-            for table in schema_tables
-            if "STLINE" in table.upper()
-        ]
+    periods = sorted(
+        period
+        for firm, period in valid_sources.keys()
+        if firm == selected_firm
+    )
 
-        selected_invoice_table = st.selectbox(
-            "Fatura Tablosu",
-            invoice_tables
-        )
+    selected_period = st.selectbox(
+        "Period",
+        periods
+    )
 
-        selected_stockline_table = st.selectbox(
-            "Stok Hattı Tablosu",
-            stockline_tables
-        )
+    source = valid_sources[
+        (selected_firm, selected_period)
+    ]
 
-        submitted = st.form_submit_button(
-            "Devam Et"
-        )
+    st.write(
+        "Invoice:",
+        source["INVOICE"]
+    )
+
+    st.write(
+        "Stock Line:",
+        source["STLINE"]
+    )
+
+    submitted = st.button("Continue")
 
     if submitted:
 
         table_config = {
             "schema": selected_schema,
-            "invoice_table": selected_invoice_table,
-            "stockline_table": selected_stockline_table,
+            "firm": selected_firm,
+            "period": selected_period,
+            "invoice_table": source["INVOICE"],
+            "stockline_table": source["STLINE"],
         }
 
         st.session_state["table_config"] = table_config
