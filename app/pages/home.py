@@ -1,125 +1,164 @@
 from nicegui import ui
 
+from app.components.app_shell import render_app_shell
+from app.styles.theme import apply_theme
 from app.styles.tokens import (
-    PAGE,
-    CONTENT,
+    BODY,
     CARD,
-    CARD_INTERACTIVE,
     EYEBROW,
+    MUTED,
     PAGE_TITLE,
     SECTION_TITLE,
-    BODY,
-    MUTED,
-    METRIC,
 )
 
-
+@ui.page('/genel-bakis')
 def render_home() -> None:
+    apply_theme()
 
-    with ui.column().classes(PAGE):
+    render_app_shell(
+        render_dashboard_content,
+        active_page='genel-bakis',
+    )
 
-        with ui.column().classes(CONTENT + " gap-6"):
+def render_dashboard_content() -> None:
 
-            # Sayfa başlığı
-            with ui.column().classes("gap-1"):
-                ui.label("MÜŞTERİ ANALİTİĞİ").classes(EYEBROW)
+    with ui.column().classes(
+        "w-full gap-6"
+    ):
 
-                ui.label(
-                    "Tasarım Sistemi Önizlemesi"
-                ).classes(PAGE_TITLE)
+        # Sayfa başlığı
+        with ui.column().classes(
+            "gap-1"
+        ):
 
-                ui.label(
-                    "Bu sayfa uygulamanın görsel dilini "
-                    "doğrulamak için hazırlanmıştır."
-                ).classes(MUTED)
+            ui.label(
+                "GENEL BAKIŞ"
+            ).classes(EYEBROW)
 
-            # Özet metrik kartları
-            with ui.grid(columns=3).classes(
-                "w-full gap-4"
+            ui.label(
+                "Müşteri Segmentasyonu"
+            ).classes(PAGE_TITLE)
+
+            ui.label(
+                "Müşteri davranışlarını analiz edin, "
+                "segmentleri inceleyin ve model sonuçlarını değerlendirin."
+            ).classes(MUTED)
+
+        # Analiz süreci
+        with ui.card().classes(
+            CARD + " w-full"
+        ):
+
+            ui.label(
+                "Analiz Süreci"
+            ).classes(SECTION_TITLE)
+
+            ui.label(
+                "Uygulama müşteri segmentasyonu sürecini "
+                "beş temel aşamada yönetir."
+            ).classes(BODY)
+
+            with ui.row().classes(
+                "w-full items-center gap-3 mt-4"
             ):
 
-                with ui.card().classes(CARD):
-                    ui.label("MÜŞTERİLER").classes(EYEBROW)
-
-                    ui.label("12.482").classes(METRIC)
-
-                    ui.label(
-                        "Segmentasyona dahil edilen müşteri sayısı"
-                    ).classes(MUTED)
-
-                with ui.card().classes(CARD):
-                    ui.label("KÜME SAYISI").classes(EYEBROW)
-
-                    ui.label("5").classes(METRIC)
-
-                    ui.label(
-                        "Mevcut kümeleme yapılandırması"
-                    ).classes(MUTED)
-
-                with ui.card().classes(CARD):
-                    ui.label("MODEL DURUMU").classes(EYEBROW)
-
-                    ui.label("HAZIR").classes(
-                        "text-3xl font-semibold text-emerald-400"
-                    )
-
-                    ui.label(
-                        "Analiz başarıyla tamamlandı"
-                    ).classes(MUTED)
-
-            # Örnek analiz kartı
-            with ui.card().classes(
-                CARD_INTERACTIVE + " w-full"
-            ):
-
-                ui.label(
-                    "Yüksek Değerli Aktif Müşteriler"
-                ).classes(SECTION_TITLE)
-
-                ui.label(
-                    "Yakın zamanda işlem yapmış, satın alma "
-                    "sıklığı ve harcama düzeyi ortalamanın "
-                    "üzerinde olan müşteriler."
-                ).classes(BODY)
-
-                with ui.row().classes(
-                    "items-center gap-3 mt-3"
-                ):
-
-                    ui.badge(
-                        "YÜKSEK DEĞER",
-                        color="primary",
-                    )
-
-                    ui.badge(
-                        "AKTİF",
-                        color="positive",
-                    )
-
-                    ui.badge(
-                        "MÜŞTERİLERİN %18,4'Ü",
-                        color="secondary",
-                    )
-
-            # Örnek butonlar
-            with ui.row().classes("gap-3"):
-
-                ui.button(
-                    "Analizi Başlat",
-                    icon="play_arrow",
-                    on_click=lambda: ui.notify(
-                        "Analiz başlatıldı"
-                    ),
-                ).props(
-                    "unelevated"
+                workflow_step(
+                    "01",
+                    "Veri",
+                    active=True,
                 )
 
-                ui.button(
-                    "Ayarlar",
-                    icon="tune",
-                    on_click=lambda: ui.notify(
-                        "Ayarlar açıldı"
-                    ),
-                ).props(
-                    "outline color=primary"
+                workflow_arrow()
+
+                workflow_step(
+                    "02",
+                    "Özellikler",
                 )
+
+                workflow_arrow()
+
+                workflow_step(
+                    "03",
+                    "Model",
+                )
+
+                workflow_arrow()
+
+                workflow_step(
+                    "04",
+                    "Yorumlama",
+                )
+
+                workflow_arrow()
+
+                workflow_step(
+                    "05",
+                    "Keşif",
+                )
+
+        # Geçici içerik
+        with ui.card().classes(
+            CARD + " w-full min-h-72"
+        ):
+
+            ui.label(
+                "Çalışma Alanı"
+            ).classes(SECTION_TITLE)
+
+            ui.label(
+                "Gerçek analiz bileşenleri sonraki adımlarda "
+                "bu alana yerleştirilecek."
+            ).classes(MUTED)
+
+
+def workflow_step(
+    number: str,
+    label: str,
+    active: bool = False,
+) -> None:
+
+    if active:
+        container_classes = (
+            "border-cyan-500/50 "
+            "bg-cyan-500/10"
+        )
+
+        number_classes = (
+            "text-cyan-400"
+        )
+    else:
+        container_classes = (
+            "border-slate-800 "
+            "bg-slate-900"
+        )
+
+        number_classes = (
+            "text-slate-500"
+        )
+
+    with ui.column().classes(
+        "flex-1 p-3 rounded-xl border gap-1 "
+        + container_classes
+    ):
+
+        ui.label(
+            number
+        ).classes(
+            "text-xs font-semibold "
+            + number_classes
+        )
+
+        ui.label(
+            label
+        ).classes(
+            "text-sm font-medium"
+        )
+
+
+def workflow_arrow() -> None:
+    ui.icon(
+        "arrow_forward",
+        size="18px",
+    ).classes(
+        "text-slate-600"
+    )
