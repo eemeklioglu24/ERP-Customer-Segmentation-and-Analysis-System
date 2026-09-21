@@ -8,6 +8,7 @@ from app.styles.tokens import (
     SECTION_TITLE,
 )
 
+from app.state.auth_state import logout
 
 def render_app_shell(
     content_renderer: Callable[[], None],
@@ -46,7 +47,11 @@ def render_app_shell(
             with ui.row().classes(
                 "items-center gap-4"
             ):
+                def handle_logout() -> None:
+                    logout()
+                    ui.navigate.to('/giris')
 
+                
                 ui.badge(
                     "YEREL",
                     color="secondary",
@@ -66,6 +71,16 @@ def render_app_shell(
                         "Veritabanı bağlı"
                     ).classes(
                         "text-sm text-slate-300"
+                    )
+
+                    ui.button(
+                        'Çıkış Yap',
+                        icon='logout',
+                        on_click=handle_logout,
+                    ).props(
+                        'flat'
+                    ).classes(
+                        'text-slate-300'
                     )
 
         # Ana uygulama alanı
