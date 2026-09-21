@@ -11,6 +11,7 @@ from ui.database_setup import database_setup
 from ui.table_setup import table_selection
 from src.functions import test_robustness
 
+
 if "stage" not in st.session_state:
     st.session_state["stage"] = "connection"
 
