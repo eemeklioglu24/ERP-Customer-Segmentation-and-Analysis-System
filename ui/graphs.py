@@ -2,10 +2,10 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 
-def get_pca(X_pca, labels, customer_ids, features):
+def get_pca(X_pca, labels, customer_ids, features, x_index, y_index):
     data_pca = pd.DataFrame({
-    "PC1": X_pca[:, 0],
-    "PC2": X_pca[:, 1],
+    "X": X_pca[:, x_index],
+    "Y": X_pca[:, y_index],
     "cluster": labels.astype(str),
     "customer_id": customer_ids,
 
@@ -18,11 +18,12 @@ def get_pca(X_pca, labels, customer_ids, features):
     })
     fig_pca = px.scatter(
         data_pca,
-        x="PC1",
-        y="PC2",
+        x="X",
+        y="Y",
         color="cluster",
         hover_data=["customer_id","recency","monetary","avg_order_value","product_count","transaction_count","total_quantity"],
     )
+    fig_pca.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
     return fig_pca
 
 def get_rfm(features):
@@ -47,6 +48,7 @@ def get_rfm(features):
             opacity=0.9
         )
     )
+    fig_3d.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
     return fig_3d
 
 def get_obj(objective_values):
@@ -60,6 +62,7 @@ def get_obj(objective_values):
         y='Y_Axis',
         markers= True
     )
+    fig_obj.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
     return fig_obj
 
 def get_sil(silhouette_scores):
@@ -73,6 +76,8 @@ def get_sil(silhouette_scores):
         y='Y_Axis',
         markers= True
     )
+    fig_sil.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
+
     return fig_sil
 
 def get_rob(silhouettes, silhouette_mean, K):
@@ -86,7 +91,7 @@ def get_rob(silhouettes, silhouette_mean, K):
         x="Run",
         y="Silhouette Score",
         markers=True,
-        title=f"Robustness Across Random Initializations (K={K})"
+        title=f"Rastgele Başlangıçlarda Dayanıklılık (K={K})"
     )
 
     fig.add_hline(
@@ -94,4 +99,5 @@ def get_rob(silhouettes, silhouette_mean, K):
         line_dash="dash",
         annotation_text=f"Mean = {silhouette_mean:.3f}"
     )
+    fig.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
     return fig

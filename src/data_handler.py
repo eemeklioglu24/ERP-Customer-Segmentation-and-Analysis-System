@@ -144,9 +144,9 @@ def dataframe_to_excel(rfm: pd.DataFrame):
             cell.fill = header_fill
 
 def get_X_pca(X):
-    pca = PCA(n_components= 2)
+    pca = PCA(n_components= 3)
     X_pca = pca.fit_transform(X)
     print(pca.explained_variance_ratio_)
     print("Total explained variance:",
     pca.explained_variance_ratio_.sum())
-    return X_pca
+    return X_pca, pca.explained_variance_ratio_

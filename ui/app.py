@@ -111,7 +111,8 @@ if st.session_state["stage"] == "dashboard":
     st.header("Dayanıklılık Analizi")
     if st.button("Run Robustness Test"):
 
-        objectives, silhouettes = test_robustness(X, len(X), K, n_runs=20)
+        robustness = test_robustness(X, len(X), K, n_runs=20)
+        objectives = robustness["objectives"]; silhouettes = robustness["silhouettes"]
 
         objective_mean = np.mean(objectives); objective_std = np.std(objectives)
         silhouette_mean = np.mean(silhouettes); silhouette_std = np.std(silhouettes)

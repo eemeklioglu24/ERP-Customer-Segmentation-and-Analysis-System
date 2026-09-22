@@ -29,7 +29,7 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
     X = data_handler.features_to_X(customer_features, scaler)
 
     # 6. Run clustering
-    data_handler.plot_X(X)
+    # data_handler.plot_X(X)
     #memberships, centroids = functions.find_and_plot_clusters(X, N, K)
     objective_values, memberships, centroids, silhouette_scores = functions.robust_kmeans(X, N, K, n_init)
     # objective_values, silhouette_scores = functions.get_obj(X, N, n_init)
@@ -58,7 +58,7 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
     insight = interpreter.interpret(cluster_data, features_clustered)
 
     # 7.1. Add Principal Component Analysis for visualization
-    X_pca = data_handler.get_X_pca(X)
+    X_pca, variance_explained = data_handler.get_X_pca(X)
 
     # print(cluster_profile)
 
@@ -97,7 +97,8 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
         "objective_values": objective_values,
         "silhouette_scores": silhouette_scores,
         "K": K,
-        "cluster_insights": insight
+        "cluster_insights": insight,
+        "variance_explained": variance_explained
     }
 
 def main(K= 3, n_init= 5):

@@ -14,6 +14,9 @@ from app.styles.tokens import (
 )
 
 from main import main
+from src.functions import test_robustness
+import ui.graphs as gp
+from nicegui.element import Element
 
 
 @ui.page('/segmentasyon')
@@ -84,266 +87,28 @@ def render_content() -> None:
                 'narrow-indicator'
             )
             
-        with ui.tab_panels(tabs,value=overview).classes('w-full bg-transparent'):
+        with ui.tab_panels(tabs,value=model).classes('w-full bg-transparent'):
 
             # Overview panel
             with ui.tab_panel(overview):
-                with ui.column().classes('w-full gap-6'):
-                    with ui.row().classes('w-full gap-4'):
-                        metric_card(
-                            'MÜŞTERİ SAYISI',
-                            '12.482',
-                            'Analize dahil edilen müşteri',
-                        )
-                        metric_card(
-                            'KÜME SAYISI',
-                            '5',
-                            'Mevcut model yapılandırması',
-                        )
-                        metric_card(
-                            'SİLHOUETTE SKORU',
-                            '0,41',
-                            'Mevcut kümeleme kalitesi',
-                        )
-                        metric_card(
-                            'ÖZELLİK SAYISI',
-                            '6',
-                            'Modelde kullanılan müşteri özellikleri',
-                        )
-
-                    with ui.card().classes(CARD + ' w-full'):
-                        ui.label('Analiz Özeti').classes(SECTION_TITLE)
-                        with ui.row().classes('w-full gap-8 mt-3'):
-                            with ui.column().classes('gap-1'):
-                                ui.label('MODEL').classes('text-xs text-slate-500')
-                                ui.label('K-Means').classes('text-sm font-medium')
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('KULLANILAN VERi').classes('text-xs text-slate-500')
-                                ui.label('ERP SATIŞ VERİLERİ').classes('text-sm font-medium')
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('DURUM').classes('text-xs text-slate-500')
-                                ui.label('HAZIR').classes('text-sm font-medium')
-
-                    with ui.card().classes(CARD + ' w-full'):
-                        ui.label('Segment Dağılımı').classes(SECTION_TITLE)
-                        ui.label(' Mevcut analizdeki müşteri kümelerinin örnek dağılımı.').classes(EYEBROW)
-                        with ui.row().classes('w-full justify-between items-center'):
-                            ui.label('Küme 0')
-                            ui.label('2.314 müşteri').classes(MUTED)
-
-                        with ui.row().classes('w-full justify-between items-center'):
-                            ui.label('Küme 1')
-                            ui.label('2.314 müşteri').classes(MUTED)
-
-                        with ui.row().classes('w-full justify-between items-center'):
-                            ui.label('Küme 2')
-                            ui.label('2.314 müşteri').classes(MUTED)
-
-                        with ui.row().classes('w-full justify-between items-center'):
-                            ui.label('Küme 3')
-                            ui.label('2.314 müşteri').classes(MUTED)
-
-                        with ui.row().classes('w-full justify-between items-center'):
-                            ui.label('Küme 4')
-                            ui.label('2.314 müşteri').classes(MUTED)
+                overview_container = ui.column().classes('w-full gap-6')
+                render_overview(overview_container)
 
             # Cluster Panel
             with ui.tab_panel(clusters):
-                with ui.column().classes('w-full gap-4'):
-
-                        ui.label('Küme Profilleri').classes(SECTION_TITLE)
-
-                        ui.label('Her kümenin müşteri davranış özelliklerini ve genel yorumunu inceleyin.').classes(MUTED)
-
-                        mock_clusters = [
-                            {
-                                'cluster_name': 'Küme 0',
-                                'customer_count': '2.314 müşteri',
-                                'recency': 'Yakın tarihli',
-                                'monetary': 'Çok yüksek',
-                                'avg_order_value': 'Yüksek',
-                                'product_count': 'Orta',
-                                'transaction_count': 'Yüksek',
-                                'total_quantity': 'Çok yüksek',
-                                'interpretation': (
-                                    'Yakın zamanda işlem yapmış, yüksek harcama '
-                                    've işlem hacmine sahip müşteri grubu.'
-                                ),
-                            }
-                        ]
-                        for cluster in mock_clusters:
-                            cluster_card(
-                                cluster_name=cluster['cluster_name'],
-                                customer_count=cluster['customer_count'],
-                                recency=cluster['recency'],
-                                monetary=cluster['monetary'],
-                                avg_order_value=cluster['avg_order_value'],
-                                product_count=cluster['product_count'],
-                                transaction_count=cluster['transaction_count'],
-                                total_quantity=cluster['total_quantity'],
-                                interpretation=cluster['interpretation'],
-                            )
-
-            # Model Panel
-            with ui.tab_panel(model):
-                with ui.column().classes('w-full gap-6'):
-                    ui.label('Model Tanılama').classes(SECTION_TITLE)
-                    ui.label('Küme sayısı seçimini, model kalitesini ve başlatma kararlılığını inceleyin.').classes(MUTED)
-                    with ui.column().classes(
-                        'w-full min-h-64 '
-                        'items-center justify-center '
-                        'rounded-xl mt-4'):
-                        k_label = ui.label().classes(EYEBROW)
-                        k_slider = ui.slider(min=2, max=10, value=5, step=1).classes('w-full')
-
-                        k_label.bind_text_from(k_slider, 'value', lambda value: f'K = {int(value)}')
-
-                        def run_segmentation():
-                            k = int(k_slider.value)
-                            service.run(k)
-
-                        ui.button('Segmentasyonu Çalıştır', on_click=run_segmentation,).classes('bg-cyan-500 text-white')
-
-
-                    with ui.row().classes('w-full gap-4'):
-                        metric_card('SİLHOUETTE SKORU','0,41','Mevcut model skoru',)
-
-                        metric_card('K ARALIĞI','2 – 10','Değerlendirilen küme sayıları',)
-
-                    with ui.card().classes(CARD + ' w-full'):
-                        ui.label('Elbow Analizi').classes(SECTION_TITLE)
-
-                        ui.label('Farklı K değerleri için küme içi hata değişimini gösterir.').classes(MUTED)
-                        with ui.column().classes(
-                            'w-full min-h-64 '
-                            'items-center justify-center '
-                            'border border-dashed border-slate-700 '
-                            'rounded-xl mt-4'
-                        ):
-                            ui.icon('show_chart',size='38px',).classes('text-slate-600')
-
-                            ui.label('Elbow grafiği burada gösterilecek').classes(MUTED)
-
-                    with ui.card().classes(CARD + ' w-full'):
-
-                        ui.label('Silhouette Analizi').classes(SECTION_TITLE)
-
-                        ui.label('Kümelerin birbirinden ayrışma ve kendi içinde tutarlılık düzeyini karşılaştırır.').classes(MUTED)
-
-                        with ui.column().classes(
-                            'w-full min-h-64 '
-                            'items-center justify-center '
-                            'border border-dashed border-slate-700 '
-                            'rounded-xl mt-4'
-                        ):
-                            ui.icon('analytics',size='38px',).classes('text-slate-600')
-
-                            ui.label('Silhouette grafiği burada gösterilecek').classes(MUTED)
-
-                    with ui.card().classes(CARD + ' w-full'):
-
-                        ui.label('Başlatma Sağlamlığı').classes(SECTION_TITLE)
-
-                        ui.label('Farklı rastgele başlangıçlarla elde edilen kümeleme sonuçlarının tutarlılığını değerlendirir.').classes(MUTED)
-
-                        with ui.row().classes('w-full gap-8 mt-4'):
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('TEST SAYISI').classes('text-xs text-slate-500')
-
-                                ui.label('10').classes('text-sm font-medium')
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('DURUM').classes('text-xs text-slate-500')
-
-                                ui.label('Kararlı').classes('text-sm font-medium text-emerald-400')
+                cluster_container = ui.column().classes('w-full gap-6')
+                render_cluster(cluster_container)
                                 
             # PCA panel
             with ui.tab_panel(pca):
-                with ui.column().classes('w-full gap-6'):
+                pca_container = ui.column().classes('w-full gap-6')
+                render_pca(pca_container)
 
-                    # Başlık
-                    with ui.column().classes('gap-1'):
-                        ui.label('PCA Görselleştirmesi').classes(SECTION_TITLE)
+            # Model Panel
+            with ui.tab_panel(model):
+                model_container = ui.column().classes('w-full gap-6')
+                render_model(model_container, overview_container, cluster_container, pca_container)
 
-                        ui.label('Müşteri segmentlerinin ana bileşenler uzayındaki dağılımını inceleyin.').classes(MUTED)
-
-                    # Görselleştirme kontrolleri
-                    with ui.card().classes(CARD + ' w-full'):
-
-                        ui.label('Görselleştirme Ayarları').classes(SECTION_TITLE)
-
-                        with ui.row().classes('w-full items-end gap-6 mt-3'):
-
-                            view_mode = ui.toggle(
-                                {
-                                    '2d': '2B',
-                                    '3d': '3B',
-                                },value='2d',)
-
-                            x_axis = ui.select(
-                                options=[
-                                    'PC1',
-                                    'PC2',
-                                    'PC3',
-                                ],
-                                value='PC1',
-                                label='X Ekseni',
-                            ).classes('w-40')
-
-                            y_axis = ui.select(
-                                options=[
-                                    'PC1',
-                                    'PC2',
-                                    'PC3',
-                                ],
-                                value='PC2',
-                                label='Y Ekseni',
-                            ).classes('w-40')
-
-                    # Grafik alanı
-                    with ui.card().classes(CARD + ' w-full'):
-
-                        ui.label('PCA Dağılımı').classes(SECTION_TITLE)
-
-                        ui.label('Müşterilerin ana bileşenler uzayındaki dağılımı bu alanda gösterilecek.').classes(MUTED)
-
-                        with ui.column().classes(
-                            'w-full min-h-80 '
-                            'items-center justify-center '
-                            'border border-dashed border-slate-700 '
-                            'rounded-xl mt-4'
-                        ):
-
-                            ui.icon('scatter_plot',size='42px',).classes('text-slate-600')
-
-                            ui.label('PCA grafiği burada gösterilecek').classes(MUTED)
-
-                    # Açıklanan varyans bilgileri
-                    with ui.card().classes(CARD + ' w-full'):
-
-                        ui.label('Görselleştirme Bilgisi').classes(SECTION_TITLE)
-
-                        ui.label('Ana bileşenlerin veri üzerindeki açıklama oranlarını gösterir.').classes(MUTED)
-
-                        with ui.grid(columns=3).classes('w-full gap-4 mt-4'):
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('1. ANA BİLEŞEN').classes('text-xs text-slate-500')
-
-                                ui.label('%42,6').classes('text-xl font-semibold')
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('2. ANA BİLEŞEN').classes('text-xs text-slate-500')
-
-                                ui.label('%23,8').classes('text-xl font-semibold')
-
-                            with ui.column().classes('gap-1'):
-                                ui.label('TOPLAM AÇIKLANAN VARYANS').classes('text-xs text-slate-500')
-
-                                ui.label('%66,4').classes('text-xl font-semibold text-cyan-400')
 def metric_card(title: str, value: str, description: str) -> None:
     with ui.card().classes(
         CARD + ' flex-1'
@@ -357,9 +122,9 @@ def metric_card(title: str, value: str, description: str) -> None:
         ui.label(description).classes(MUTED)
 
 def cluster_card(
-    cluster_name: str, customer_count: str, recency: str,
+    cluster_name: str, recency: str,
     transaction_count: str, monetary: str, avg_order_value: str,
-    product_count: str, total_quantity: str,interpretation: str,) -> None:
+    product_count: str, total_quantity: str, interpretation: str,) -> None:
 
     with ui.card().classes(
         CARD + ' w-full'
@@ -370,7 +135,6 @@ def cluster_card(
         ):
             with ui.column().classes('gap-1'):
                 ui.label(cluster_name).classes(SECTION_TITLE)
-                ui.label(customer_count).classes(MUTED)
 
             ui.badge(
                 'KÜME',
@@ -413,3 +177,242 @@ def cluster_feature(
         ui.label(value).classes(
             'text-sm font-medium'
         )
+
+def render_overview(container: Element):
+    container.clear()
+    with container:
+        if service.results is None:
+            ui.label('Henüz segmentasyon çalıştırılmadı.')
+            return
+
+        with ui.row().classes('w-full gap-4'):
+            metric_card(
+                'MÜŞTERİ SAYISI',
+                str(len(service.results.get("X"))),
+                'Analize dahil edilen müşteri',
+            )
+            metric_card(
+                'KÜME SAYISI',
+                str(service.results.get("K")),
+                'Mevcut model yapılandırması',
+            )
+            metric_card(
+                'SİLHOUETTE SKORU',
+                f"{service.results.get("silhouette_scores")[-1]:.2f}",
+                'Mevcut kümeleme kalitesi',
+            )
+
+        with ui.card().classes(CARD + ' w-full'):
+            ui.label('Segment Dağılımı').classes(SECTION_TITLE)
+            for i in range(service.results["K"]):
+                    customer_count = int((service.results["memberships"] == i).sum())
+
+                    with ui.row().classes('w-full justify-between items-center'):
+                        ui.label(f'Küme {i}')
+                        ui.label(str(customer_count)).classes(MUTED)
+
+def render_cluster(container: Element):
+    container.clear()
+    with container:
+        if service.results is None:
+            ui.label('Henüz segmentasyon çalıştırılmadı.')
+            return
+
+        with ui.column().classes('w-full gap-4'):
+            ui.label('Küme Profilleri').classes(SECTION_TITLE)
+
+            for insight in service.results["cluster_insights"]:
+                cluster_card(
+                    cluster_name= "Küme " + str(insight["cluster"]),
+                    recency= insight["recency_level"],
+                    transaction_count= insight['frequency_level'],
+                    monetary= insight['monetary_level'],
+                    avg_order_value= insight['avg_order_value_level'],
+                    product_count= insight['product_count_level'],
+                    total_quantity= insight['total_quantity_level'],
+                    interpretation= insight['segment_name'],
+                )
+
+def render_model(container: Element, overview_container: Element, cluster_container: Element, pca_container: Element):
+    container.clear()
+    with container:
+    
+        with ui.column().classes('w-full gap-6'):
+            ui.label('Model Tanılama').classes(SECTION_TITLE)
+            with ui.column().classes(
+                'w-full min-h-64 '
+                'items-center justify-center '
+                'rounded-xl mt-4'):
+                k_label = ui.label().classes(EYEBROW)
+                k_slider = ui.slider(min=2, max=10, value=4, step=1).classes('w-full')
+
+                k_label.bind_text_from(k_slider, 'value', lambda value: f'K = {int(value)}')
+
+                def run_segmentation():
+                    k = int(k_slider.value)
+                    service.run(k)
+                    render_overview(overview_container)
+                    render_cluster(cluster_container)
+                    render_pca(pca_container)
+                    render_model(container, overview_container, cluster_container, pca_container)
+
+                ui.button('Segmentasyonu Çalıştır', on_click=run_segmentation,).classes('bg-cyan-500 text-white')
+
+            if service.results is None:
+                    ui.label('Henüz segmentasyon çalıştırılmadı.')
+                    return
+
+            with ui.row().classes('w-full gap-4'):
+                metric_card('SİLHOUETTE SKORU', f"{service.results["silhouette_scores"][-1]:.2f}",'Mevcut model skoru',)
+
+                metric_card('K ARALIĞI','2 – 10','Değerlendirilen küme sayıları',)
+
+            with ui.card().classes(CARD + ' w-full'):
+                ui.label('Elbow Analizi').classes(SECTION_TITLE)
+
+                ui.label('Farklı K değerleri için küme içi hata değişimini gösterir.').classes(MUTED)
+                with ui.column().classes(
+                    'w-full min-h-64 '
+                    'items-center justify-center '
+                    'border border-dashed border-slate-700 '
+                    'rounded-xl mt-4'
+                ):
+    
+                    ui.plotly(gp.get_obj(service.results["objective_values"]))
+
+            with ui.card().classes(CARD + ' w-full'):
+
+                ui.label('Silhouette Analizi').classes(SECTION_TITLE)
+
+                ui.label('Kümelerin birbirinden ayrışma ve kendi içinde tutarlılık düzeyini karşılaştırır.').classes(MUTED)
+
+                with ui.column().classes(
+                    'w-full min-h-64 '
+                    'items-center justify-center '
+                    'border border-dashed border-slate-700 '
+                    'rounded-xl mt-4'
+                ):
+
+                    ui.plotly(gp.get_sil(service.results["silhouette_scores"]))
+
+            with ui.card().classes(CARD + ' w-full'):
+
+                ui.label('Başlatma Sağlamlığı').classes(SECTION_TITLE)
+
+                ui.label('Farklı rastgele başlangıçlarla elde edilen kümeleme sonuçlarının tutarlılığını değerlendirir.').classes(MUTED)
+
+                with ui.column().classes(
+                    'w-full min-h-64 '
+                    'items-center justify-center '
+                    'border border-dashed border-slate-700 '
+                    'rounded-xl mt-4'
+                ):
+                    robustness = test_robustness(service.results['X'], len(service.results['X']), service.results['K'], n_runs=20)
+                    ui.plotly(gp.get_rob(robustness["silhouettes"], robustness["silhouette_min"], service.results['K']))
+                    with ui.row().classes('w-full gap-8 mt-4'):
+                            metric_card("Ortalama Siluet", f"{robustness["silhouette_mean"]:.3f}", "")
+                            metric_card("Siluet Sapması", f"{robustness["silhouette_std"]:.3f}", "")
+                            metric_card("Ortalama Amaç", f"{robustness["objective_mean"]:.2f}", "")
+                            metric_card("Amaç Sapması", f"{robustness["objective_std"]:.2f}", "")
+
+def render_pca(container: Element):
+    container.clear()
+    with container:
+        if service.results is None:
+            ui.label('Henüz segmentasyon çalıştırılmadı.')
+            return
+    
+        with ui.column().classes('w-full gap-6'):
+            # Başlık
+            with ui.column().classes('gap-1'):
+                ui.label('PCA Görselleştirmesi').classes(SECTION_TITLE)
+
+            # Görselleştirme kontrolleri
+            with ui.card().classes(CARD + ' w-full'):
+
+                ui.label('Görselleştirme Ayarları').classes(SECTION_TITLE)
+
+                with ui.row().classes('w-full items-end gap-6 mt-3'):
+
+                    view_mode = ui.toggle(
+                        {
+                            '2d': '2B',
+                            '3d': '3B',
+                        },value='2d',)
+
+                    x_axis = ui.select(
+                        options=[
+                            'PC1',
+                            'PC2',
+                            'PC3',
+                        ],
+                        value='PC1',
+                        label='X Ekseni',
+                    ).classes('w-40')
+
+                    y_axis = ui.select(
+                        options=[
+                            'PC1',
+                            'PC2',
+                            'PC3',
+                        ],
+                        value='PC2',
+                        label='Y Ekseni',
+                    ).classes('w-40')
+
+            # Grafik alanı
+            with ui.card().classes(CARD + ' w-full'):
+
+                ui.label('PCA Dağılımı').classes(SECTION_TITLE)
+
+                graph_container = ui.column().classes(
+                                    'w-full min-h-80 '
+                                    'items-center justify-center '
+                                    'border border-dashed border-slate-700 '
+                                    'rounded-xl mt-4'
+                                )
+                
+                component_map = {'PC1': 0,'PC2': 1,'PC3': 2}
+
+                def update_graph():
+                    graph_container.clear()
+
+                    x_index = component_map[x_axis.value]
+                    y_index = component_map[y_axis.value]
+
+                    fig = gp.get_pca(service.results['X_pca'], service.results['memberships'], service.results['customer_ids'], service.results['features'], x_index, y_index)
+                    with graph_container:
+                        ui.plotly(fig)
+                x_axis.on_value_change(lambda _: update_graph())
+                y_axis.on_value_change(lambda _: update_graph())
+
+                update_graph()
+
+                
+
+            # Açıklanan varyans bilgileri
+            with ui.card().classes(CARD + ' w-full'):
+
+                ui.label('Görselleştirme Bilgisi').classes(SECTION_TITLE)
+
+                with ui.grid(columns=3).classes('w-full gap-4 mt-4'):
+
+                    with ui.column().classes('gap-1'):
+                        ui.label('1. ANA BİLEŞEN').classes('text-xs text-slate-500')
+
+                        ui.label(f"{service.results['variance_explained'][0]:.2f}").classes('text-xl font-semibold')
+
+                    with ui.column().classes('gap-1'):
+                        ui.label('2. ANA BİLEŞEN').classes('text-xs text-slate-500')
+
+                        ui.label(f"{service.results['variance_explained'][1]:.2f}").classes('text-xl font-semibold')
+
+                    with ui.column().classes('gap-1'):
+                                            ui.label('3. ANA BİLEŞEN').classes('text-xs text-slate-500')
+                    
+                                            ui.label(f"{service.results['variance_explained'][2]:.2f}").classes('text-xl font-semibold')
+
+                    with ui.column().classes('gap-1'):
+                        ui.label('TOPLAM AÇIKLANAN VARYANS').classes('text-xs text-slate-500')
+
+                        ui.label(f"{service.results['variance_explained'].sum():.2f}").classes('text-xl font-semibold text-cyan-400')

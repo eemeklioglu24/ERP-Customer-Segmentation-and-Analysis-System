@@ -172,7 +172,24 @@ def test_robustness(X, N, K, n_runs=20):
         score = silhouette_score(X,memberships)
         silhouettes.append(score)
 
-    return objectives, silhouettes
+    objective_mean = np.mean(objectives); objective_std = np.std(objectives)
+    silhouette_mean = np.mean(silhouettes); silhouette_std = np.std(silhouettes)
+    silhouette_min = np.min(silhouettes); silhouette_max = np.max(silhouettes)
+    objective_min = np.min(objectives); objective_max = np.max(objectives)
+
+    return {
+        "objectives": objectives,
+        "silhouettes": silhouettes, 
+        "objective_mean": objective_mean,
+        "silhouette_mean": silhouette_mean,
+        "silhouette_min": silhouette_min,
+        "objective_min": objective_min,
+        "objective_std": objective_std,
+        "silhouette_std": silhouette_std,
+        "silhouette_max": silhouette_max,
+        "objective_max": objective_max
+    }
+
 
 def diognose_k_values(X, N, n_init= 20):
     rows = []
