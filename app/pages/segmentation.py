@@ -3,6 +3,7 @@ from nicegui import ui
 from app.components.app_shell import render_app_shell
 from app.styles.theme import apply_theme
 from app.state.auth_state import require_authentication
+from app.services.result_storage import service
 from app.styles.tokens import (
     EYEBROW,
     MUTED,
@@ -11,6 +12,8 @@ from app.styles.tokens import (
     SECTION_TITLE,
     BODY
 )
+
+from main import main
 
 
 @ui.page('/segmentasyon')
@@ -188,9 +191,23 @@ def render_content() -> None:
                 with ui.column().classes('w-full gap-6'):
                     ui.label('Model Tanılama').classes(SECTION_TITLE)
                     ui.label('Küme sayısı seçimini, model kalitesini ve başlatma kararlılığını inceleyin.').classes(MUTED)
-                    with ui.row().classes('w-full gap-4'):
-                        metric_card('SEÇİLEN K','5','Mevcut küme sayısı',)
+                    with ui.column().classes(
+                        'w-full min-h-64 '
+                        'items-center justify-center '
+                        'rounded-xl mt-4'):
+                        k_label = ui.label().classes(EYEBROW)
+                        k_slider = ui.slider(min=2, max=10, value=5, step=1).classes('w-full')
 
+                        k_label.bind_text_from(k_slider, 'value', lambda value: f'K = {int(value)}')
+
+                        def run_segmentation():
+                            k = int(k_slider.value)
+                            service.run(k)
+
+                        ui.button('Segmentasyonu Çalıştır', on_click=run_segmentation,).classes('bg-cyan-500 text-white')
+
+
+                    with ui.row().classes('w-full gap-4'):
                         metric_card('SİLHOUETTE SKORU','0,41','Mevcut model skoru',)
 
                         metric_card('K ARALIĞI','2 – 10','Değerlendirilen küme sayıları',)
