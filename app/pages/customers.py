@@ -114,8 +114,9 @@ def render_customer_list(container: Element):
             def handle_selection(e):
                 if e.selection:
                     selected_row = e.selection[0]
-                    service.selected_customer_id = selected_row["Müşteri ID"]
-                    ui.notify(f'Müşteri seçildi: {service.selected_customer_id}')
+                    service.results["selected_customer_id"] = selected_row["Müşteri ID"]
+                    ui.notify(f'Müşteri seçildi: {service.results.get("selected_customer_id")}')
+                    render_customer_context.refresh()
 
             customer_search = ui.input(label='Müşteri Ara', placeholder='Müşteri ID')
 
@@ -159,11 +160,47 @@ def render_customer_list(container: Element):
             customer_search.on_value_change(lambda _: update_table())
 
         
-
+@ui.refreshable
 def render_customer_context(container: Element):
     container.clear()
     with container:
         if service.results is None:
             ui.label('Henüz segmentasyon çalıştırılmadı.')
             return
+        if service.results.get("selected_customer_id") is None:
+            ui.label('Detaylarını görüntülemek için bir müşteri seçin.').classes(MUTED)
+            return
+
+        features = service.results["features"]
+        K = service.results["K"]
+
+        customers = features.copy()
+        customers = customers.reset_index()
+        customers = customers.round(2)
+        customers = customers.rename(columns={"customer_id": "Müşteri ID"})
+        customer = customers[customers["Müşteri ID"] == service.results.get("selected_customer_id")].iloc[0]
+
+        ui.label(f'Müşteri {service.results.get("selected_customer_id")}').classes(PAGE_TITLE)
+        ui.badge(f'Küme {int(customer["cluster"])}')
+
+        metrics = [
+            ("SON ALIŞVERİŞ", f"{customer["recency"]:.0f}", ""),
+            ("TOPLAM HARCAMA", f"{customer["monetary"]:.2f}", ""),
+            ("İŞLEM SAYISI", f"{customer["transaction_count"]:.0f}", ""),
+            ("ÜRÜN SAYISI", f"{customer["product_count"]:.0f}", ""),
+            ("TOPLAM MİKTAR", f"{customer["total_quantity"]:.0f}", ""),
+            ("ORT. SİPARİŞ DEĞERİ", f"{customer["avg_order_value"]:.2f}", ""),
+        ]
+
+        cluster_id = int(customer["cluster"])
+        interpretation = service.results.get("cluster_insights")[cluster_id]
+
+        with ui.row().classes('w-full gap-4 flex-wrap'):
+            for title, value, unit in metrics:
+                metric_card(title, f"{value}", unit)
+            for key, value in interpretation.items():
+                metric_card(f"{key}", f"{value}", "")
+
+
+        
         
