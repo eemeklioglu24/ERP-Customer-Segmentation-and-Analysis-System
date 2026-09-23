@@ -101,6 +101,63 @@ def render_customer_list(container: Element):
         if service.results is None:
             ui.label('Henüz segmentasyon çalıştırılmadı.')
             return
+
+        features = service.results["features"]
+        K = service.results["K"]
+
+        customers = features.copy()
+        customers = customers.reset_index()
+        customers = customers.round(2)
+        customers = customers.rename(columns={"customer_id": "Müşteri ID"})
+
+        with ui.row().classes('w-full gap-4'):
+            def handle_selection(e):
+                if e.selection:
+                    selected_row = e.selection[0]
+                    service.selected_customer_id = selected_row["Müşteri ID"]
+                    ui.notify(f'Müşteri seçildi: {service.selected_customer_id}')
+
+            customer_search = ui.input(label='Müşteri Ara', placeholder='Müşteri ID')
+
+            cluster_filter = ui.select(['Tümü'] + [f'Küme {i}' for i in range(K)], value='Tümü', label='Küme')
+
+            columns = [
+                {
+                    'name': column,
+                    'label': column,
+                    'field': column,
+                    'sortable': True,
+                }
+                for column in customers.columns
+            ]
+            rows = customers.to_dict('records')
+
+            table = ui.table(
+                columns=columns,
+                rows=rows,
+                row_key='Müşteri ID',
+                pagination=10,
+                selection='single',
+                on_select=handle_selection,
+            ).classes('w-full')
+
+            def update_table():
+                filtered = customers.copy()
+
+                if cluster_filter.value != 'Tümü':
+                    cluster_number = int(cluster_filter.value.split()[-1])
+                    filtered = filtered[filtered["cluster"] == cluster_number]
+
+                if customer_search.value:
+                    search = str(customer_search.value).strip()
+                    filtered = filtered[filtered["Müşteri ID"].astype(str).str.contains(search, case=False)]
+
+                table.rows = filtered.to_dict('records')
+                table.update()
+
+            cluster_filter.on_value_change(lambda _: update_table())
+            customer_search.on_value_change(lambda _: update_table())
+
         
 
 def render_customer_context(container: Element):
