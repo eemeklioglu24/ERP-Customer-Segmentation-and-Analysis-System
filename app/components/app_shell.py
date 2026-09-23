@@ -24,64 +24,28 @@ def render_app_shell(
             "w-full h-16 px-5 "
             "items-center justify-between "
             "border-b border-slate-800 "
-            "bg-slate-950"
-        ):
+            "bg-slate-950"):
 
-            with ui.row().classes(
-                "items-center gap-3"
-            ):
-                ui.icon(
-                    "hub",
-                    size="26px",
-                ).classes(
-                    "text-cyan-400"
-                )
+            with ui.row().classes("items-center gap-3"):
+                ui.icon("hub",size="26px",).classes("text-cyan-400")
 
                 with ui.column().classes("gap-0"):
-                    ui.label(
-                        "Müşteri Analitiği"
-                    ).classes(
-                        "text-sm font-bold tracking-widest"
-                    )
+                    ui.label("Müşteri Analitiği").classes("text-sm font-bold tracking-widest")
 
-            with ui.row().classes(
-                "items-center gap-4"
-            ):
+            with ui.row().classes("items-center gap-4"):
                 def handle_logout() -> None:
                     logout()
                     ui.navigate.to('/giris')
 
                 
-                ui.badge(
-                    "YEREL",
-                    color="secondary",
-                )
+                ui.badge("YEREL",color="secondary",)
 
-                with ui.row().classes(
-                    "items-center gap-2"
-                ):
-                    ui.icon(
-                        "database",
-                        size="18px",
-                    ).classes(
-                        "text-emerald-400"
-                    )
+                with ui.row().classes("items-center gap-2"):
+                    ui.icon("database",size="18px",).classes("text-emerald-400")
 
-                    ui.label(
-                        "Veritabanı bağlı"
-                    ).classes(
-                        "text-sm text-slate-300"
-                    )
+                    ui.label("Veritabanı bağlı").classes("text-sm text-slate-300")
 
-                    ui.button(
-                        'Çıkış Yap',
-                        icon='logout',
-                        on_click=handle_logout,
-                    ).props(
-                        'flat'
-                    ).classes(
-                        'text-slate-300'
-                    )
+                    ui.button('Çıkış Yap',icon='logout',on_click=handle_logout,).props('flat').classes('text-slate-300')
 
         # Ana uygulama alanı
         with ui.row().classes(
@@ -150,45 +114,21 @@ def render_app_shell(
                 "p-5 gap-6"
             ):
 
-                ui.label(
-                    "ANALİZ DURUMU"
-                ).classes(EYEBROW)
+                ui.label("ANALİZ DURUMU").classes(EYEBROW)
 
                 with ui.column().classes("gap-4"):
 
-                    context_item(
-                        "Küme Sayısı",
-                        "5",
-                    )
+                    context_item("Küme Sayısı","5",)
 
-                    context_item(
-                        "Müşteri Sayısı",
-                        "12.482",
-                    )
+                    context_item("Müşteri Sayısı","12.482",)
 
-                    context_item(
-                        "Model",
-                        "K-Means",
-                    )
+                    context_item("Model","K-Means",)
 
-                    context_item(
-                        "Durum",
-                        "Hazır",
-                    )
+                ui.separator().classes("bg-slate-800")
 
-                ui.separator().classes(
-                    "bg-slate-800"
-                )
+                ui.label("Mevcut Çalışma").classes(SECTION_TITLE)
 
-                ui.label(
-                    "Mevcut Çalışma"
-                ).classes(SECTION_TITLE)
-
-                ui.label(
-                    "Henüz gerçek analiz verisi bağlanmadı. "
-                    "Bu panel daha sonra seçilen veri ve "
-                    "model bilgilerini gösterecek."
-                ).classes(MUTED)
+                ui.label("Henüz gerçek analiz verisi bağlanmadı. Bu panel daha sonra seçilen veri ve model bilgilerini gösterecek.").classes(MUTED)
 
 
 def navigation_button(
@@ -216,14 +156,7 @@ def navigation_button(
             "hover:text-slate-100"
         )
 
-    button = ui.button(
-        icon=icon,
-        on_click=lambda: ui.navigate.to(target),
-    ).props(
-        'flat round'
-    ).classes(
-        button_classes
-    )
+    button = ui.button(icon=icon,on_click=lambda: ui.navigate.to(target),).props('flat round').classes(button_classes)
 
     button.tooltip(tooltip)
 
@@ -233,17 +166,7 @@ def context_item(
     value: str,
 ) -> None:
 
-    with ui.column().classes(
-        "gap-1"
-    ):
-        ui.label(
-            label
-        ).classes(
-            "text-xs text-slate-500"
-        )
+    with ui.column().classes("gap-1"):
+        ui.label(label).classes("text-xs text-slate-500")
 
-        ui.label(
-            value
-        ).classes(
-            "text-sm font-medium text-slate-200"
-        )
+        ui.label(value).classes("text-sm font-medium text-slate-200")
