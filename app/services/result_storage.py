@@ -20,4 +20,6 @@ class ResultStorage:
     def set_db_config(self, db_config: dict):
         self.db_config = db_config
 
+    def set_table_config(self, table_config: dict):
+            self.table_config = table_config
 service = ResultStorage()
