@@ -5,6 +5,8 @@ from app.state.auth_state import (
     login,
 )
 from app.styles.theme import apply_theme
+from app.services.result_storage import service
+from src.erp.db_connection import create_connection, test_connection
 
 @ui.page('/giris')
 def render_login() -> None:
@@ -33,17 +35,30 @@ def render_login() -> None:
             ui.label("Müşteri segmentasyonu ve davranış analizi platformu").classes('text-sm text-slate-400')
             ui.separator().classes('bg-slate-800 my-3')
 
-            def handle_login() -> None:
-                login()
-                ui.navigate.to("/genel-bakis")
+            server_input = ui.input("Sunucu").props('outlined dense').classes('w-full')
+            database_input = ui.input("Veritabanı").props('outlined dense').classes('w-full')
+            user_input = ui.input("Kullanıcı Adı").props('outlined dense').classes('w-full')
+            password_input = ui.input("Şifre", password= True, password_toggle_button= True).props('outlined dense').classes('w-full')
 
-            ui.button(
-                'Geliştirme Girişi',
-                icon='login',
-                on_click=handle_login,
-            ).classes('w-full').props('unelevated')
-            ui.label(
-                'Bu giriş yalnızca geliştirme ve test amacıyla kullanılmaktadır.'
-            ).classes(
-                'text-xs text-slate-500 text-center'
-            )
+            def test_db_connection():
+                db_config = {
+                                "server": server_input.value,
+                                "database": database_input.value,
+                                "username": user_input.value,
+                                "password": password_input.value
+                            }
+                service.set_db_config(db_config)
+                service.is_connected = test_connection(service.db_config)
+
+                if service.is_connected:
+                    ui.notify('Bağlantı başarılı.', type='positive')
+                else:
+                    ui.notify('Bağlantı kurulamadı.', type='negative')
+
+            ui.button('Bağlantıyı Test Et', icon='login', on_click=test_db_connection,).classes('w-full').props('unelevated')
+
+
+
+def handle_login() -> None:
+    login()
+    ui.navigate.to("/genel-bakis")
