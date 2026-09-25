@@ -1,6 +1,7 @@
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 
 def get_pca(X_pca, labels, customer_ids, features, x_index, y_index):
     data_pca = pd.DataFrame({
@@ -101,3 +102,34 @@ def get_rob(silhouettes, silhouette_mean, K):
     )
     fig.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
     return fig
+
+def get_bar(clusters, counts, percentages):
+        fig = go.Figure()
+
+        fig.add_bar(
+            x=[f'Küme {cluster}' for cluster in clusters],
+            y=counts,
+            customdata=percentages,
+            hovertemplate=(
+                '<b>%{x}</b><br>'
+                'Müşteri: %{y}<br>'
+                'Oran: %{customdata:.1f}%'
+                '<extra></extra>'
+            ),
+            text=[
+                f'{count} (%{percentage:.1f})'
+                for count, percentage in zip(counts, percentages)
+            ],
+            textposition='outside',
+        )
+
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(l=20, r=20, t=20, b=20),
+            showlegend=False,
+            xaxis_title=None,
+            yaxis_title='Müşteri Sayısı',
+        )
+
+        return fig
