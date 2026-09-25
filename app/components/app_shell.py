@@ -11,9 +11,10 @@ from app.styles.tokens import (
 from app.state.auth_state import logout
 
 def render_app_shell(
-    content_renderer: Callable[[], None],
-    active_page: str,
+    routes: dict[str, Callable[[], None]],
 ) -> None:
+
+    nav_buttons = {}
 
     with ui.column().classes(
         "w-full min-h-screen bg-slate-950 text-slate-100 gap-0"
@@ -61,41 +62,36 @@ def render_app_shell(
                 "items-center py-5 gap-3"
             ):
 
-                navigation_button(
+                nav_buttons['/genel-bakis'] = navigation_button(
                     icon='space_dashboard',
                     tooltip='Genel Bakış',
                     target='/genel-bakis',
-                    active=active_page == 'genel-bakis',
                 )
 
-                navigation_button(
+                nav_buttons['/segmentasyon'] = navigation_button(
                     icon='scatter_plot',
                     tooltip='Segmentasyon',
                     target='/segmentasyon',
-                    active=active_page == 'segmentasyon',
                 )
 
-                navigation_button(
+                nav_buttons['/musteriler'] = navigation_button(
                     icon='groups',
                     tooltip='Müşteriler',
                     target='/musteriler',
-                    active=active_page == 'musteriler',
                 )
 
-                navigation_button(
+                nav_buttons['/veri-kaynagi'] = navigation_button(
                     icon='storage',
                     tooltip='Veri Kaynağı',
                     target='/veri-kaynagi',
-                    active=active_page == 'veri-kaynagi',
                 )
 
                 ui.space()
 
-                navigation_button(
+                nav_buttons['/ayarlar'] = navigation_button(
                     icon='settings',
                     tooltip='Ayarlar',
                     target='/ayarlar',
-                    active=active_page == 'ayarlar',
                 )
 
             # Ana çalışma alanı
@@ -104,7 +100,7 @@ def render_app_shell(
                 "p-6 gap-6 "
                 "bg-slate-950"
             ):
-                content_renderer()
+                ui.sub_pages(routes).classes('w-full')
 
             # Sağ bağlam paneli
             with ui.column().classes(
@@ -130,6 +126,21 @@ def render_app_shell(
 
                 ui.label("Henüz gerçek analiz verisi bağlanmadı. Bu panel daha sonra seçilen veri ve model bilgilerini gösterecek.").classes(MUTED)
 
+    def update_navigation(path: str) -> None:
+        path = path.split('?', 1)[0]
+
+        for target, button in nav_buttons.items():
+            if path == target:
+                button.classes(add='bg-cyan-500/15 text-cyan-400',remove='text-slate-400',)
+            else:
+                button.classes(add='text-slate-400', remove='bg-cyan-500/15 text-cyan-400',)
+
+    router = ui.context.client.sub_pages_router
+
+    router.on_path_changed(update_navigation)
+    update_navigation(router.current_path)
+
+
 
 def navigation_button(
     icon: str,
@@ -141,24 +152,24 @@ def navigation_button(
     button_classes = (
         "w-11 h-11 rounded-xl "
         "flex items-center justify-center "
-        "transition-colors"
+        "transition-colors "
+        "text-slate-400 "
+        "hover:bg-slate-800 "
+        "hover:text-slate-100"
     )
 
-    if active:
-        button_classes += (
-            " bg-cyan-500/15 "
-            "text-cyan-400"
+    button = (
+        ui.button(
+            icon=icon,
+            on_click=lambda: ui.navigate.to(target),
         )
-    else:
-        button_classes += (
-            " text-slate-400 "
-            "hover:bg-slate-800 "
-            "hover:text-slate-100"
-        )
-
-    button = ui.button(icon=icon,on_click=lambda: ui.navigate.to(target),).props('flat round').classes(button_classes)
+        .props('flat round')
+        .classes(button_classes)
+    )
 
     button.tooltip(tooltip)
+
+    return button
 
 
 def context_item(

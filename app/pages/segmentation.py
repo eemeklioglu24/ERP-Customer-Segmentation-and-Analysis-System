@@ -19,20 +19,9 @@ import ui.graphs as gp
 from nicegui.element import Element
 
 
-@ui.page('/segmentasyon')
-def render_segmentation() -> None:
-    if not require_authentication():
-        return
-
-    apply_theme()
-
-    render_app_shell(
-        render_content,
-        active_page='segmentasyon',
-    )
-
-
 def render_content() -> None:
+    apply_theme()
+    
     with ui.column().classes('w-full gap-6'):
         with ui.column().classes('gap-1'):
 

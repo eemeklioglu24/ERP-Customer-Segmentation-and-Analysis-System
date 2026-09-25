@@ -1,4 +1,5 @@
 from main import main
+from nicegui import ui
 
 class ResultStorage:
     def __init__(self):
@@ -9,7 +10,10 @@ class ResultStorage:
         self.analysis_config = None
 
     def run(self, k: int):
-        self.results = main(K=k, n_init=5)
+        try:
+            self.results = main(K=k, n_init=5)
+        except Exception as e:
+             ui.notify(f"Kümeleştirme çalıştırılamadı. Lütfen Veri Kaynağı sayfasından ERP verilerini yenileyiniz.", type="negative")
         return self.results
 
     def clear(self):

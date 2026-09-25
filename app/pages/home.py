@@ -12,20 +12,9 @@ from app.styles.tokens import (
     SECTION_TITLE,
 )
 
-@ui.page('/genel-bakis')
-def render_home() -> None:
-    if not require_authentication():
-        return
-
-    apply_theme()
-
-    render_app_shell(
-        render_dashboard_content,
-        active_page='genel-bakis',
-    )
 
 def render_dashboard_content() -> None:
-
+    apply_theme()
     with ui.column().classes("w-full gap-6"):
 
         # Sayfa başlığı

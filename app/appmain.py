@@ -2,9 +2,8 @@ from nicegui import ui
 import os
 from dotenv import load_dotenv
 
-from app.pages.home import render_home
 from app.styles.theme import apply_theme
-from app.state.auth_state import is_authenticated
+from app.state.auth_state import require_authentication
 
 from app.pages import customers
 from app.pages import data_source
@@ -13,12 +12,45 @@ from app.pages import segmentation
 from app.pages import settings
 from app.pages import login
 
+from app.pages.home import render_dashboard_content
+from app.pages.segmentation import render_content
+from app.pages.customers import render_customers
+from app.pages.data_source import render_data
+from app.pages.settings import render_set
+
+from app.components.app_shell import render_app_shell
+
+APP_ROUTES = {
+        '/genel-bakis': render_dashboard_content,
+        '/segmentasyon': render_content,
+        '/musteriler': render_customers,
+        '/veri-kaynagi': render_data,
+        '/ayarlar': render_set,
+}
+
+# @ui.page('/')
+# def index() -> None:
+    
+
+#     if is_authenticated():
+#         ui.navigate.to('/genel-bakis')
+#     else:
+#         ui.navigate.to('/giris')
+
 @ui.page('/')
-def index() -> None:
-    if is_authenticated():
+@ui.page('/{_:path}')
+def application() -> None:
+    if not require_authentication():
+        return
+    
+    path = ui.context.client.request.url.path
+
+    if path not in APP_ROUTES:
         ui.navigate.to('/genel-bakis')
-    else:
-        ui.navigate.to('/giris')
+        return
+    apply_theme()
+
+    render_app_shell(APP_ROUTES)
 
 load_dotenv()
 storage_secret = os.getenv('APP_STORAGE_SECRET')

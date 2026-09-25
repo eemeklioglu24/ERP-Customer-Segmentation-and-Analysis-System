@@ -10,21 +10,8 @@ from app.styles.tokens import (
 )
 
 
-@ui.page('/ayarlar')
-def render_settings() -> None:
-    if not require_authentication():
-        return
-
+def render_set() -> None:
     apply_theme()
-
-    render_app_shell(
-        render_content,
-        active_page='ayarlar',
-    )
-
-
-def render_content() -> None:
-
     with ui.column().classes('w-full gap-2'):
 
         ui.label(

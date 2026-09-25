@@ -19,21 +19,8 @@ from dotenv import load_dotenv
 from datetime import timedelta, date, datetime
 
 
-@ui.page('/veri-kaynagi')
-def render_data_source() -> None:
-    if not require_authentication():
-        return
-    
+def render_data() -> None:
     apply_theme()
-
-    render_app_shell(
-        render_content,
-        active_page='veri-kaynagi',
-    )
-
-
-def render_content() -> None:
-
     with ui.column().classes('w-full gap-2'):
         ui.label('VERİ KAYNAĞI').classes(EYEBROW)
         ui.label('ERP Veri Yapılandırması').classes(PAGE_TITLE)
