@@ -102,30 +102,6 @@ def render_app_shell(
             ):
                 ui.sub_pages(routes).classes('w-full')
 
-            # Sağ bağlam paneli
-            with ui.column().classes(
-                "w-72 "
-                "border-l border-slate-800 "
-                "bg-slate-900/40 "
-                "p-5 gap-6"
-            ):
-
-                ui.label("ANALİZ DURUMU").classes(EYEBROW)
-
-                with ui.column().classes("gap-4"):
-
-                    context_item("Küme Sayısı","5",)
-
-                    context_item("Müşteri Sayısı","12.482",)
-
-                    context_item("Model","K-Means",)
-
-                ui.separator().classes("bg-slate-800")
-
-                ui.label("Mevcut Çalışma").classes(SECTION_TITLE)
-
-                ui.label("Henüz gerçek analiz verisi bağlanmadı. Bu panel daha sonra seçilen veri ve model bilgilerini gösterecek.").classes(MUTED)
-
     def update_navigation(path: str) -> None:
         path = path.split('?', 1)[0]
 

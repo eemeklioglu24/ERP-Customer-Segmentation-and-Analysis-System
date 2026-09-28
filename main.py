@@ -26,6 +26,8 @@ def run_pipeline(num_customers=200, K=3, n_init= 5):
 
     # 5. Convert customer features to an N x D NumPy array
     # X = data_handler.rfm_to_X(rfm, scaler)
+    outlier_mask, lower_bounds, upper_bounds = functions.detect_outliers_iqr(customer_features)
+
     X = data_handler.features_to_X(customer_features, scaler)
 
     # 6. Run clustering

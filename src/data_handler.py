@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from openpyxl.styles import PatternFill
+import numpy as np
 
 def calculate_rfm(sales: pd.DataFrame, reference_date= None):
     # calculates Recency, Frequency, and Monetary from sales data. Does not care whether sales is synthesized or real
@@ -100,7 +101,14 @@ def rfm_to_X(rfm: pd.DataFrame, scaler: StandardScaler):
 
 def features_to_X(customer_features: pd.DataFrame, scaler: StandardScaler):
     # Turns the customer dataframe to a numpy array object and standardizes the data
-    X = customer_features[["recency", "transaction_count", "monetary", "avg_order_value", "product_count", "total_quantity"]].to_numpy()
+    LOG_FEATURES = ["transaction_count", "monetary", "avg_order_value", "product_count", "total_quantity",]
+
+    features_processed = customer_features.copy()
+
+    features_processed[LOG_FEATURES] = np.log1p(
+        features_processed[LOG_FEATURES]
+    )
+    X = features_processed[["recency", "transaction_count", "monetary", "avg_order_value", "product_count", "total_quantity"]].to_numpy()
     X_scaled = scaler.fit_transform(X)
     return X_scaled
 

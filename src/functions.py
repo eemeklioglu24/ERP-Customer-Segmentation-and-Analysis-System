@@ -215,4 +215,16 @@ def diognose_specific_k(X, N, K):
         _, counts = np.unique(memberships, return_counts=True)
 
         print(f"Run {i + 1}: "f"silhouette={score:.3f}, "f"sizes={counts}")
+
+def detect_outliers_iqr(features: pd.DataFrame, factor: float = 1.5,):
+    q1 = features.quantile(0.25)
+    q3 = features.quantile(0.75)
+    iqr = q3 - q1
+
+    lower_bound = q1 - factor * iqr
+    upper_bound = q3 + factor * iqr
+
+    outlier_mask = (features.lt(lower_bound) | features.gt(upper_bound))
+
+    return outlier_mask, lower_bound, upper_bound
     
