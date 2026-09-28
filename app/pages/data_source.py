@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 
 from app.components.app_shell import render_app_shell
 from app.styles.theme import apply_theme
@@ -76,9 +76,18 @@ def render_analysis_range():
 
     if isinstance(latest_date, datetime):
         latest_date = latest_date.date()
+
+    default_range = app.storage.user.get("default_analysis_range", "all",)
     
     default_end = latest_date
-    default_start = earliest_date
+    if default_range == "12m":
+        default_start = latest_date - timedelta(days=365)
+
+    elif default_range == "6m":
+        default_start = latest_date - timedelta(days=182)
+
+    else:
+        default_start = earliest_date
 
     with ui.card().classes('w-full p-5 gap-4'):
         ui.label("Analiz Aralığı").classes('text-lg font-semibold')

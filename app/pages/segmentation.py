@@ -325,9 +325,9 @@ def render_pca(container: Element):
 
                     view_mode = ui.toggle(
                         {
-                            '2d': '2B',
-                            '3d': '3B',
-                        },value='2d',)
+                            2: '2B',
+                            3: '3B',
+                        },value=2,)
 
                     x_axis = ui.select(
                         options=[
@@ -349,6 +349,16 @@ def render_pca(container: Element):
                         label='Y Ekseni',
                     ).classes('w-40')
 
+                    z_axis = ui.select(
+                        options=[
+                            'PC1',
+                            'PC2',
+                            'PC3',
+                        ],
+                        value='PC3',
+                        label='Z Ekseni',
+                    ).classes('w-40')
+
             # Grafik alanı
             with ui.card().classes(CARD + ' w-full'):
 
@@ -368,12 +378,15 @@ def render_pca(container: Element):
 
                     x_index = component_map[x_axis.value]
                     y_index = component_map[y_axis.value]
+                    z_index = component_map[z_axis.value]
 
-                    fig = gp.get_pca(service.results['X_pca'], service.results['memberships'], service.results['customer_ids'], service.results['features'], x_index, y_index)
+                    fig = gp.get_pca(service.results['X_pca'], service.results['memberships'], x_index, y_index, z_index, dimensions= view_mode.value)
                     with graph_container:
                         ui.plotly(fig)
                 x_axis.on_value_change(lambda _: update_graph())
                 y_axis.on_value_change(lambda _: update_graph())
+                z_axis.on_value_change(lambda _: update_graph())
+                view_mode.on_value_change(lambda _: update_graph())
 
                 update_graph()
 

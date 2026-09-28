@@ -54,13 +54,11 @@ def render_analysis_defaults() -> None:
                 ui.label('Veri Kaynağı sayfası ilk açıldığında seçilecek tarih aralığı.').classes('text-xs text-slate-500')
 
             range_select = ui.select(
-                {
-                    'all': 'Tüm veri seti',
-                    '12m': 'Son 12 ay',
-                    '6m': 'Son 6 ay',
-                }, value=current_range).classes('w-48')
-
-            range_select.on('update:model-value', lambda e: app.storage.user.__setitem__('default_analysis_range',e.args,),)
+                            {
+                                'all': 'Tüm veri seti',
+                                '12m': 'Son 12 ay',
+                                '6m': 'Son 6 ay',
+                            },value=current_range, on_change=lambda e: app.storage.user.__setitem__('default_analysis_range', e.value,),).classes('w-48')
 
 def render_application_preferences() -> None:
 
@@ -83,22 +81,19 @@ def render_application_preferences() -> None:
                 ui.label('Varsayılan Tablo Satır Sayısı').classes('text-sm font-medium text-slate-200')
                 ui.label('Müşteri listelerinde bir sayfada gösterilecek kayıt sayısı.').classes('text-xs text-slate-500')
 
-            page_size_select = ui.select(
-                [25, 50, 100],
-                value=current_page_size,
-            ).classes('w-48')
-
-            page_size_select.on('update:model-value', lambda e: app.storage.user.__setitem__('table_page_size',int(e.args),),)
+            page_size_select = ui.select([25, 50, 100], value=current_page_size, on_change=lambda e: app.storage.user.__setitem__('table_page_size', int(e.value),),).classes('w-48')
 
 def render_data_management() -> None:
 
     def clear_analysis_results() -> None:
-        if service.results:
-            service.results.clear()
+        service.results = None
 
         dialog.close()
 
-        ui.notify('Analiz sonuçları temizlendi.',type='positive',)
+        ui.notify(
+            'Analiz sonuçları temizlendi.',
+            type='positive',
+        )
 
     with ui.dialog() as dialog:
         with ui.card().classes('w-96 p-5 gap-4 ''bg-slate-900 border border-slate-800'):

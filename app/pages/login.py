@@ -47,7 +47,7 @@ def render_login() -> None:
                     ui.notify('Bağlantı kurulamadı.', type='negative')
 
             with ui.column().classes('w-full') as db_config_container:
-                ui.label("1. Veritabanı Bağlantısı").classes('text-2xl font-semibold')
+                ui.label("Veritabanı Bağlantısı").classes('text-2xl font-semibold')
                 ui.separator().classes('bg-slate-800 my-3')
 
                 server_input = ui.input("Sunucu").props('outlined dense').classes('w-full')

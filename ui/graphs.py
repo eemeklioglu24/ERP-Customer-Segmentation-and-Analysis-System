@@ -3,29 +3,59 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
-def get_pca(X_pca, labels, customer_ids, features, x_index, y_index):
-    data_pca = pd.DataFrame({
-    "X": X_pca[:, x_index],
-    "Y": X_pca[:, y_index],
-    "cluster": labels.astype(str),
-    "customer_id": customer_ids,
-
-    "recency": features["recency"].values,
-    "monetary": features["monetary"].values,
-    "avg_order_value": features["avg_order_value"].values,
-    "product_count": features["product_count"].values,
-    "transaction_count": features["transaction_count"].values,
-    "total_quantity": features["total_quantity"].values
+def get_pca(X_pca, memberships, x_index, y_index, z_index, dimensions=2,):
+    df = pd.DataFrame({
+        "PC1": X_pca[:, x_index],
+        "PC2": X_pca[:, y_index],
+        "PC3": X_pca[:, z_index],
+        "cluster": memberships.astype(str),
     })
-    fig_pca = px.scatter(
-        data_pca,
-        x="X",
-        y="Y",
-        color="cluster",
-        hover_data=["customer_id","recency","monetary","avg_order_value","product_count","transaction_count","total_quantity"],
-    )
-    fig_pca.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
-    return fig_pca
+
+    if dimensions == 3:
+        fig = px.scatter_3d(
+            df,
+            x="PC1",
+            y="PC2",
+            z="PC3",
+            color="cluster",
+            labels={
+                "cluster": "Küme",
+                "PC1": "PC1",
+                "PC2": "PC2",
+                "PC3": "PC3",
+            },
+        )
+
+        fig.update_traces(
+            marker={
+                "size": 4,
+                "opacity": 0.75,
+            }
+        )
+
+    else:
+        fig = px.scatter(
+            df,
+            x="PC1",
+            y="PC2",
+            color="cluster",
+            labels={
+                "cluster": "Küme",
+                "PC1": "PC1",
+                "PC2": "PC2",
+            },
+        )
+
+        fig.update_traces(
+            marker={
+                "size": 7,
+                "opacity": 0.75,
+            }
+        )
+
+    fig.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#cbd5e1',), legend=dict(title='Küme',), margin=dict(l=60,r=40,t=40,b=60,),)
+
+    return fig
 
 def get_rfm(features):
     cluster_colors = ["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928", "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99"]
