@@ -1,26 +1,42 @@
 import pandas as pd
 
 def classify_z(value):
-    # General Classifier
-    if value < -1.0:
+    # General classifier for standardized feature values
+
+    if value < -1.25:
         return "çok düşük"
-    elif value < -0.5:
+    elif value < -0.50:
         return "düşük"
-    elif value <= 0.5:
+    elif value < -0.15:
+        return "hafif düşük"
+    elif value <= 0.15:
         return "orta"
-    elif value <= 1.0:
+    elif value <= 0.50:
+        return "hafif yüksek"
+    elif value <= 1.25:
         return "yüksek"
     else:
         return "çok yüksek"
 
+
 def classify_recency_z(value):
-    # Recency is Inverted
-    if value < -0.5:
+    # Recency is inverted:
+    # lower recency = more recent customer activity
+
+    if value < -1.25:
+        return "çok yakın tarihli"
+    elif value < -0.50:
         return "yakın tarihli"
-    elif value > 0.5:
+    elif value < -0.15:
+        return "nispeten yakın tarihli"
+    elif value <= 0.15:
+        return "ortalama"
+    elif value <= 0.50:
+        return "nispeten pasif"
+    elif value <= 1.25:
         return "pasif"
     else:
-        return "nispeten yakın tarihli"
+        return "çok pasif"
 
 def interpret_cluster(row):
     # Interprets a single cluster
@@ -59,30 +75,76 @@ def interpret_cluster(row):
         "monetary_share": row["monetary_share"]
     }
 
-def get_segment_name(recency_level, frequency_level, monetary_level):
-    # This code is so ass
-    high_levels = ["yüksek", "çok yüksek"]
-    low_levels = ["düşük", "çok düşük"]
 
-    if frequency_level in high_levels and monetary_level in high_levels:
-        if recency_level == "pasif":
+def get_segment_name(recency_level, frequency_level, monetary_level,):
+    
+    LEVEL_SCORE = {
+        "çok düşük": -3,
+        "düşük": -2,
+        "hafif düşük": -1,
+        "orta": 0,
+        "hafif yüksek": 1,
+        "yüksek": 2,
+        "çok yüksek": 3,
+    }
+
+    RECENCY_SCORE = {
+        "çok yakın tarihli": -3,
+        "yakın tarihli": -2,
+        "nispeten yakın tarihli": -1,
+        "ortalama": 0,
+        "nispeten pasif": 1,
+        "pasif": 2,
+        "çok pasif": 3,
+    }
+    recency = RECENCY_SCORE[recency_level]
+    frequency = LEVEL_SCORE[frequency_level]
+    monetary = LEVEL_SCORE[monetary_level]
+
+    # High-value customers
+    if frequency >= 2 and monetary >= 2:
+        if recency >= 1:
+            return "Risk Altındaki Yüksek Değerli Müşteriler"
+        return "Yüksek Değerli Aktif Müşteriler"
+
+    # Low-value customers
+    if frequency <= -2 and monetary <= -2:
+        if recency >= 1:
+            return "Pasif Düşük Değerli Müşteriler"
+        return "Aktif Düşük Değerli Müşteriler"
+
+    # Very inactive customers should be identified explicitly
+    if recency >= 2:
+        if monetary >= 2:
             return "Risk Altındaki Yüksek Harcamalı Müşteriler"
+        elif monetary >= 0:
+            return "Pasifleşmiş Orta Değerli Müşteriler"
         else:
+            return "Pasif Düşük Değerli Müşteriler"
+
+    # Recent customers
+    if recency <= -1:
+        if monetary >= 2:
             return "Yüksek Harcamalı Aktif Müşteriler"
 
-    if frequency_level in low_levels and monetary_level in low_levels:
-        if recency_level == "pasif":
-            return "Pasif Düşük Harcamalı Müşteriler"
-        else:
-            return "Yakın Dönemde Alım Yapan Düşük Etkileşimli Müşteriler"
+        if frequency >= 1 and monetary >= 1:
+            return "Gelişen Değerli Müşteriler"
 
-    if monetary_level in high_levels and frequency_level not in high_levels:
-        return "Yüksek Harcamalı Seyrek Müşteriler"
+        if monetary >= 0 and frequency <= 0:
+            return "Yakın Dönem Harcama Odaklı Müşteriler"
 
-    if frequency_level in high_levels and monetary_level not in high_levels:
-        return "Sık Alım Yapan Müşteriler"
+        if frequency >= 1:
+            return "Aktif Sık Alım Yapan Müşteriler"
+
+    # Remaining spending/frequency imbalance
+    if monetary > frequency:
+        return "Harcama Odaklı Müşteriler"
+
+    if frequency > monetary:
+        return "Etkileşim Odaklı Müşteriler"
 
     return "Orta Değerli Müşteriler"
+          
 
 def interpret(cluster_data: pd.DataFrame, features_clustered: pd.DataFrame):
     # Interprets all clusters
