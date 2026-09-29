@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import random
 import pandas as pd
 from datetime import datetime, timedelta
 from .base import ERPInterface
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as p
@@ -23,7 +25,7 @@ class FakeERP(ERPInterface):
             })
         return pd.DataFrame(customers)
 
-    def get_sales(
+    def get_sales(self,
         n_customers: int = 1000,
         n_products: int = 250,
         start_date: str = "2024-01-01",
@@ -43,7 +45,7 @@ class FakeERP(ERPInterface):
 
         for customer_number in range(1, n_customers + 1):
 
-            customer_id = f"CUST_{customer_number:05d}"
+            customer_id = customer_number
 
             # For now: every customer has between 1 and 12 invoices
             n_invoices = rng.integers(1, 13)

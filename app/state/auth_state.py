@@ -13,20 +13,23 @@ def logout() -> None:
     app.storage.user.clear()
 
 def require_authentication() -> bool:
-    if not is_authenticated():
-        ui.navigate.to('/giris')
-        return False
+    if service.has_fake_data:
+        return True
+    else:
+        if not is_authenticated():
+            ui.navigate.to('/giris')
+            return False
 
-    if service.db_config is None:
-        service.is_connected = False
-        logout()
-        ui.navigate.to('/giris')
-        return False
+        if service.db_config is None:
+            service.is_connected = False
+            logout()
+            ui.navigate.to('/giris')
+            return False
 
-    if not test_connection(service.db_config):
-        service.is_connected = False
-        logout()
-        ui.navigate.to('/giris')
-        return False
+        if not test_connection(service.db_config):
+            service.is_connected = False
+            logout()
+            ui.navigate.to('/giris')
+            return False
 
     return True

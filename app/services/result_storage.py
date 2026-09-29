@@ -8,6 +8,7 @@ class ResultStorage:
         self.table_config = None
         self.is_connected = False
         self.analysis_config = None
+        self.has_fake_data = False
 
     def run(self, k: int):
         try:
@@ -30,5 +31,8 @@ class ResultStorage:
 
     def set_analysis_config(self, analysis_config: dict):
         self.analysis_config = analysis_config
+
+    def set_fake_data(self):
+         self.has_fake_data = True
         
 service = ResultStorage()

@@ -6,6 +6,7 @@ from app.state.auth_state import (
 )
 from app.styles.theme import apply_theme
 from app.services.result_storage import service
+from app.pages.data_source import refresh
 from src.erp.db_connection import create_connection, test_connection
 from src.erp.db_metadata import get_available_tables
 
@@ -56,6 +57,7 @@ def render_login() -> None:
                 password_input = ui.input("Şifre", password= True, password_toggle_button= True).props('outlined dense').classes('w-full')
 
                 ui.button('Bağlantıyı Test Et', icon='login', on_click=test_db_connection,).classes('w-full').props('unelevated')
+                render_synth_button()
 
             with ui.column().classes('w-full') as table_config_container:
                 pass
@@ -66,6 +68,14 @@ def render_login() -> None:
 def handle_login() -> None:
     login()
     ui.navigate.to("/genel-bakis")
+
+def render_synth_button():
+    def generate_fake_data():
+        service.set_fake_data()
+        refresh()
+        handle_login()
+    ui.separator()
+    ui.button('Demo Verileriyle Devam Et', icon='login', on_click=generate_fake_data,).classes('w-full').props('unelevated')
 
 def render_table_config(table_config_container):
     def confirm():

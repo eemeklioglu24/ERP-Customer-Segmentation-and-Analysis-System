@@ -4,6 +4,7 @@ from app.components.app_shell import render_app_shell
 from app.styles.theme import apply_theme
 from app.state.auth_state import require_authentication
 from src.erp.logo_erp import LogoERP
+from src.erp.fake_erp import FakeERP
 from src.erp.db_connection import create_connection
 
 from app.services.result_storage import service
@@ -135,6 +136,10 @@ def render_analysis_range():
 
 def refresh():
     # load_dotenv()
-    erp = LogoERP(service.table_config)
-    erp.refresh_features(service.db_config)
+    if service.has_fake_data:
+        erp = FakeERP()
+        erp.refresh_features()
+    else:
+        erp = LogoERP(service.table_config)
+        erp.refresh_features(service.db_config)
     ui.notify('Müşteri özellikleri yenilendi.', type='positive')
