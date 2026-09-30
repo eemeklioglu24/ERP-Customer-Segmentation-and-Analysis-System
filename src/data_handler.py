@@ -1,3 +1,4 @@
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
@@ -128,7 +129,10 @@ def plot_X(X):
 
 def dataframe_to_csv(rfm: pd.DataFrame, name):
     # Saves rfm dataframe to an csv file
-    rfm.to_csv(name, index=False)
+    path = Path(name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    rfm.to_csv(path, index=False)
 
 def dataframe_to_excel(rfm: pd.DataFrame):
     import pandas as pd

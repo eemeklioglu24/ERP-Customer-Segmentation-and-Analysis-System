@@ -14,6 +14,7 @@ import re
 
 @ui.page('/giris')
 def render_login() -> None:
+    print('LOGIN PAGE RENDERED')
     apply_theme()
     if is_authenticated():
         ui.navigate.to('/genel-bakis')

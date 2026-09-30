@@ -9,7 +9,7 @@ from sklearn.metrics import silhouette_score
 import matplotlib as plt
 import matplotlib.pyplot as pltplt
 
-def run_pipeline(num_customers=200, K=3, n_init= 5):
+def run_pipeline( K=3, n_init= 5):
 
     # 1. Connect to data source
     plt.rcParams["axes3d.mouserotationstyle"] = "azel"
