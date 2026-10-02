@@ -10,6 +10,7 @@ from app.pages.data_source import refresh
 from src.erp.db_connection import create_connection, test_connection
 from src.erp.db_metadata import get_available_tables
 
+
 import re
 
 @ui.page('/giris')
@@ -68,12 +69,14 @@ def render_login() -> None:
 
 def handle_login() -> None:
     login()
+    refresh()
+    service.run(4)
     ui.navigate.to("/genel-bakis")
 
 def render_synth_button():
     def generate_fake_data():
         service.set_fake_data()
-        refresh()
+        #refresh()
         handle_login()
     ui.separator()
     ui.button('Demo Verileriyle Devam Et', icon='login', on_click=generate_fake_data,).classes('w-full').props('unelevated')

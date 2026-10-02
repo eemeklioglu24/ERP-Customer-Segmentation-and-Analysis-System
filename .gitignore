@@ -1,7 +1,7 @@
 # Generated / company data
 docs/*.csv
 sql/private/
-src/erp/logo_erp.py
+*.exe
 
 # Secrets
 .streamlit/secrets.toml

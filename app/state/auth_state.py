@@ -17,21 +17,18 @@ def require_authentication() -> bool:
         return True
     else:
         if not is_authenticated():
-            print('AUTH: redirecting to /giris')
             ui.navigate.to('/giris')
             return False
 
         if service.db_config is None:
             service.is_connected = False
             logout()
-            print('AUTH: redirecting to /giris')
             ui.navigate.to('/giris')
             return False
 
         if not test_connection(service.db_config):
             service.is_connected = False
             logout()
-            print('AUTH: redirecting to /giris')
             ui.navigate.to('/giris')
             return False
 

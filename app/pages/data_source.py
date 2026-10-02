@@ -141,5 +141,26 @@ def refresh():
         erp.refresh_features()
     else:
         erp = LogoERP(service.table_config)
-        erp.refresh_features(service.db_config)
+        conn = create_connection(service.db_config)
+        try:
+            earliest_date, latest_date = erp.get_date_range(conn)
+        finally:
+            conn.close()
+
+        if isinstance(earliest_date, datetime):
+            earliest_date = earliest_date.date()
+        if isinstance(latest_date, datetime):
+            latest_date = latest_date.date()
+    
+        default_range = app.storage.user.get("default_analysis_range", "all",)
+        
+        default_end = latest_date
+        if default_range == "12m":
+            default_start = latest_date - timedelta(days=365)
+        elif default_range == "6m":
+            default_start = latest_date - timedelta(days=182)
+        else:
+            default_start = earliest_date
+
+        erp.refresh_features(default_start, default_end, db_config=service.db_config)
     ui.notify('Müşteri özellikleri yenilendi.', type='positive')

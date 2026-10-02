@@ -1,7 +1,7 @@
 from multiprocessing import freeze_support
 import secrets
 from pathlib import Path
-from nicegui import ui
+from nicegui import ui, app
 import os
 from dotenv import load_dotenv
 
@@ -24,6 +24,8 @@ APP_ROUTES = {
         '/veri-kaynagi': render_data,
         '/ayarlar': render_set,
 }
+
+# The final packaging command is python -m PyInstaller --onefile --noconfirm --clean --windowed  --name MusteriAnalitigi --icon=app\styles\process.ico  app\appmain.py
 
 # @ui.page('/')
 # def index() -> None:
@@ -54,10 +56,7 @@ def get_storage_secret() -> str:
     env_secret = os.getenv('APP_STORAGE_SECRET')
 
     if env_secret:
-        print('Using APP_STORAGE_SECRET from environment')
         return env_secret
-
-    print('APP_STORAGE_SECRET not found; using local generated secret')
 
     config_dir = Path.home() / '.musteri_analitigi'
     config_dir.mkdir(exist_ok=True)
@@ -65,10 +64,8 @@ def get_storage_secret() -> str:
     secret_file = config_dir / 'storage_secret.txt'
 
     if secret_file.exists():
-        print('Using previously generated local secret')
         return secret_file.read_text().strip()
-
-    print('Creating new local secret')
+    
     new_secret = secrets.token_urlsafe(32)
     secret_file.write_text(new_secret)
 
@@ -77,13 +74,14 @@ def get_storage_secret() -> str:
 if __name__ == '__main__':
     freeze_support()
     load_dotenv()
-    storage_secret = os.getenv('APP_STORAGE_SECRET')
+    storage_secret = get_storage_secret()
+    app.native.window_args['maximized'] = True
 
-    if not storage_secret:
-        raise RuntimeError('APP_STORAGE_SECRET ortam değişkeni bulunamadı.')
     ui.run(
         title="Müşteri Analitiği",
         host="127.0.0.1",
         storage_secret=storage_secret,
-        reload=False
+        reload=False,
+        native=True,
+        favicon="./app/styles/process.ico"
     )
