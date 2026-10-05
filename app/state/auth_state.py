@@ -11,6 +11,7 @@ def login() -> None:
 
 def logout() -> None:
     app.storage.user.clear()
+    service.reset_fake_data()
 
 def require_authentication() -> bool:
     if service.has_fake_data:

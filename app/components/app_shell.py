@@ -9,6 +9,7 @@ from app.styles.tokens import (
 )
 
 from app.state.auth_state import logout
+import os
 
 def render_app_shell(
     routes: dict[str, Callable[[], None]],
@@ -36,6 +37,15 @@ def render_app_shell(
             with ui.row().classes("items-center gap-4"):
                 def handle_logout() -> None:
                     logout()
+                    
+                    file_path = "./docs/Customer Features.csv"
+
+                    # Check if the file exists before deleting
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                        print(f"'{file_path}' has been deleted successfully.")
+                    else:
+                        print(f"The file '{file_path}' does not exist.")
                     ui.navigate.to('/giris')
 
                 

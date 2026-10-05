@@ -34,5 +34,8 @@ class ResultStorage:
 
     def set_fake_data(self):
          self.has_fake_data = True
+
+    def reset_fake_data(self):
+         self.has_fake_data = False
         
 service = ResultStorage()
